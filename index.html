@@ -1,814 +1,803 @@
-{\rtf1\ansi\ansicpg1252\cocoartf2821
-\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 HelveticaNeue;}
-{\colortbl;\red255\green255\blue255;}
-{\*\expandedcolortbl;;}
-\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Salário Organizer</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--bg:#0e1117;--card:#1c2333;--border:#2a3347;--accent:#4f8ef7;--green:#38d9a9;--yellow:#ffd43b;--red:#ff6b6b;--text:#e8edf5;--muted:#6b7a99;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);max-width:430px;margin:0 auto;padding-bottom:100px;}
+.screen{display:none;}.screen.active{display:block;}
+#loginScreen{min-height:100vh;display:none;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;}
+#loginScreen.active{display:flex;}
+.login-logo{width:72px;height:72px;background:linear-gradient(135deg,#1a2f50,#2a4a7a);border:2px solid rgba(79,142,247,.4);border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:34px;margin-bottom:24px;box-shadow:0 8px 32px rgba(79,142,247,.2);}
+.login-title{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;text-align:center;margin-bottom:6px;}
+.login-title span{color:var(--accent);}
+.login-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:32px;line-height:1.5;}
+.login-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:24px;width:100%;max-width:360px;}
+.lf{margin-bottom:14px;}
+.lf label{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;font-weight:600;}
+.lf input{width:100%;background:#131d30;border:1px solid var(--border);border-radius:11px;padding:13px 14px;color:var(--text);font-size:15px;font-family:'DM Sans',sans-serif;outline:none;-webkit-appearance:none;transition:border-color .2s;}
+.lf input:focus{border-color:var(--accent);}
+.lf input::placeholder{color:var(--muted);}
+.pass-wrap{position:relative;}
+.pass-wrap input{padding-right:44px;}
+.pass-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;line-height:1;}
+.login-btn{width:100%;border:none;border-radius:13px;padding:15px;color:#fff;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;cursor:pointer;margin-top:6px;background:var(--accent);}
+.login-btn:active{opacity:.8;}
+.login-toggle{text-align:center;margin-top:14px;font-size:12px;color:var(--muted);}
+.login-toggle span{color:var(--accent);cursor:pointer;font-weight:600;}
+.login-err{font-size:12px;color:var(--red);text-align:center;margin-top:10px;min-height:16px;}
+.login-footer{font-size:11px;color:var(--muted);text-align:center;margin-top:20px;line-height:1.6;}
+#appScreen{display:none;}
+#appScreen.active{display:block;}
+.tabbar{position:sticky;top:0;z-index:50;background:#131b2e;border-bottom:1px solid var(--border);display:flex;}
+.tab{flex:1;padding:14px 0 12px;text-align:center;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.page{display:none;}.page.active{display:block;}
+.hdr{background:#161b27;padding:20px 16px 16px;border-bottom:1px solid var(--border);}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.hdr h1{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;}.hdr h1 span{color:var(--accent);}
+.user-pill{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:30px;padding:5px 12px 5px 5px;cursor:pointer;}
+.user-pill:active{border-color:var(--accent);}
+.u-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--green));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:12px;font-weight:800;color:#fff;flex-shrink:0;}
+.u-nm{font-size:12px;font-weight:600;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+#userMenu{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:200;}
+#userMenu.on{display:block;}
+.um-bg{position:absolute;inset:0;}
+.um-box{position:absolute;top:62px;right:16px;background:#1e2d45;border:1px solid var(--border);border-radius:16px;padding:20px;width:230px;box-shadow:0 12px 40px rgba(0,0,0,.5);}
+.um-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;margin-bottom:2px;}
+.um-email{font-size:11px;color:var(--muted);margin-bottom:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.um-sep{height:1px;background:var(--border);margin-bottom:12px;}
+.um-item{padding:10px 0;font-size:13px;cursor:pointer;color:var(--muted);}
+.um-item:active{color:var(--text);}
+.um-item.logout{color:var(--red);font-weight:700;margin-top:4px;}
+.month-sel{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:7px 12px;font-size:13px;margin-bottom:14px;}
+.month-sel select{background:transparent;border:none;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;}
+.month-sel option{background:#1c2333;}
+.yr-btn{background:none;border:none;color:var(--text);font-size:20px;cursor:pointer;padding:0 4px;}
+.yr-label{font-size:13px;font-weight:700;min-width:36px;text-align:center;}
+.total-box{background:#1a2f50;border:1px solid rgba(79,142,247,.35);border-radius:14px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;}
+.total-box .lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+.total-box .big{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--green);}
+.disc-pill{background:rgba(255,107,107,.18);border:1px solid rgba(255,107,107,.35);color:var(--red);padding:5px 11px;border-radius:20px;font-size:12px;font-weight:600;}
+.content{padding:14px;}
+.sec{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin:22px 0 10px;display:flex;align-items:center;gap:8px;}
+.sec::after{content:'';flex:1;height:1px;background:var(--border);}
+.sc{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:13px 14px;margin-bottom:10px;position:relative;overflow:hidden;}
+.sc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;}
+.sc.dr::before{background:var(--accent);}.sc.rs::before{background:var(--green);}.sc.pl::before{background:var(--yellow);}
+.sc-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:3px 9px;border-radius:6px;}
+.tag.dr{background:rgba(79,142,247,.15);color:var(--accent);}.tag.rs{background:rgba(56,217,169,.15);color:var(--green);}.tag.pl{background:rgba(255,212,59,.15);color:var(--yellow);}
+.net-v{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;}
+.sc.dr .net-v{color:var(--accent);}.sc.rs .net-v{color:var(--green);}.sc.pl .net-v{color:var(--yellow);}
+.sc-grid{display:grid;grid-template-columns:1fr 72px 48px;gap:7px;align-items:end;}
+.fi{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;padding:7px 9px;}
+.fi label{display:block;font-size:10px;color:var(--muted);margin-bottom:3px;}
+.fi input[type=number]{background:transparent;border:none;color:var(--text);font-family:'Syne',sans-serif;font-size:14px;font-weight:600;width:100%;outline:none;-webkit-appearance:none;}
+.fi input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
+.chk-cell{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;}
+.chk-cell span{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+.chk-wrap{width:26px;height:26px;border-radius:7px;border:2px solid var(--border);background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+.chk-wrap.on{background:var(--green);border-color:var(--green);}
+.chk-wrap svg{display:none;width:14px;height:14px;}.chk-wrap.on svg{display:block;}
+.tbar{background:#131d30;border:1px solid rgba(79,142,247,.2);border-radius:14px;padding:14px;margin:14px 0;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center;}
+.ti .lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px;}
+.ti .val{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;}
+.isec{background:#111827;border-top:2px solid var(--border);margin:20px -14px 0;padding:18px 14px;}
+.iblk{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:13px 14px;margin-bottom:12px;}
+.iblk-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:11px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.dot8{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.avail{margin-left:auto;font-size:11px;font-weight:600;border-radius:8px;padding:2px 8px;background:rgba(56,217,169,.12);border:1px solid rgba(56,217,169,.25);color:var(--green);}
+.br{display:flex;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);gap:6px;}
+.br:last-of-type{border-bottom:none;}
+.bn{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:500;flex:1;}
+.bd{width:9px;height:9px;border-radius:2px;flex-shrink:0;}
+.bw{display:flex;align-items:center;gap:2px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:7px;padding:5px 7px;flex:1;max-width:110px;}
+.bw span{font-size:10px;color:var(--muted);}
+.bw input{background:transparent;border:none;color:var(--text);font-family:'Syne',sans-serif;font-size:13px;font-weight:600;width:100%;outline:none;text-align:right;-webkit-appearance:none;}
+.bw input::-webkit-inner-spin-button{-webkit-appearance:none;}
+.bpct{font-size:10px;color:var(--muted);min-width:26px;text-align:right;flex-shrink:0;}
+.cust-row{border-top:1px solid var(--border);padding-top:9px;margin-top:6px;}
+.cust-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px;}
+.cust-grid{display:grid;grid-template-columns:1fr 52px 100px 34px;gap:5px;align-items:end;}
+.cf{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:7px;padding:6px 8px;}
+.cf label{display:block;font-size:10px;color:var(--muted);margin-bottom:2px;}
+.cf input{background:transparent;border:none;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;width:100%;outline:none;-webkit-appearance:none;}
+.cf input::-webkit-inner-spin-button{-webkit-appearance:none;}
+.sub-blk{border:1px solid var(--border);border-radius:9px;overflow:hidden;margin-top:9px;}
+.sub-hdr{background:rgba(79,142,247,.09);border-bottom:1px solid var(--border);padding:7px 11px;font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;}
+.sub-row{display:grid;grid-template-columns:1fr 100px 34px;gap:5px;align-items:end;padding:7px 11px;border-bottom:1px solid rgba(42,51,71,.5);}
+.sub-row:last-child{border-bottom:none;}
+.sf{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;padding:5px 7px;}
+.sf label{display:block;font-size:10px;color:var(--muted);margin-bottom:2px;}
+.sf input{background:transparent;border:none;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;width:100%;outline:none;-webkit-appearance:none;}
+.sf input::-webkit-inner-spin-button{-webkit-appearance:none;}
+.warn{font-size:11px;color:var(--red);text-align:center;margin-top:7px;display:none;padding:6px;background:rgba(255,107,107,.09);border-radius:7px;}
+.warn.on{display:block;}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px;}
+.btn{width:100%;border:none;border-radius:12px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;padding:15px;cursor:pointer;-webkit-appearance:none;}
+.btn:active{opacity:.8;}.btn:disabled{opacity:.45;pointer-events:none;}
+.btn.pri{background:var(--accent);color:#fff;}
+.btn.sec{background:rgba(56,217,169,.15);border:1px solid rgba(56,217,169,.3);color:var(--green);}
+.btn.imp{background:rgba(255,212,59,.12);border:1px solid rgba(255,212,59,.3);color:var(--yellow);width:100%;margin-top:10px;}
+.btn.pdf{background:#1e3a5f;border:1px solid rgba(79,142,247,.45);color:var(--accent);width:100%;margin-top:10px;}
+.status{font-size:12px;color:var(--muted);text-align:center;margin-top:10px;min-height:18px;}
+#overlay{display:none;position:fixed;inset:0;background:rgba(10,14,22,.92);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:14px;backdrop-filter:blur(4px);}
+#overlay.on{display:flex;}
+.ring{width:46px;height:46px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:sp .8s linear infinite;}
+@keyframes sp{to{transform:rotate(360deg);}}
+.ov-msg{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;}.ov-sub{font-size:12px;color:var(--muted);}
+#preview{display:none;position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:1000;flex-direction:column;}
+#preview.on{display:flex;}
+.pv-bar{background:#1a2540;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0;}
+.pv-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;}
+.pv-close{background:rgba(255,255,255,.1);border:none;color:var(--text);font-size:16px;width:32px;height:32px;border-radius:8px;cursor:pointer;}
+.pv-scroll{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;align-items:center;}
+.pv-scroll img{max-width:100%;border-radius:6px;}
+.pv-actions{background:#1a2540;border-top:1px solid var(--border);padding:14px 16px;display:flex;gap:10px;flex-shrink:0;}
+.pv-btn{flex:1;border:none;border-radius:11px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;padding:14px;cursor:pointer;}
+.pv-btn.dl{background:var(--green);color:#071510;}.pv-btn.cl{background:rgba(255,255,255,.08);border:1px solid var(--border);color:var(--text);}
+#importModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:900;align-items:flex-end;justify-content:center;}
+#importModal.on{display:flex;}
+.im-sheet{background:#1c2333;border:1px solid var(--border);border-radius:20px 20px 0 0;width:100%;max-width:430px;max-height:80vh;overflow-y:auto;padding:20px 16px 36px;}
+.im-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:6px;}
+.im-sub{font-size:12px;color:var(--muted);margin-bottom:18px;}
+.im-item{background:#131d30;border:1px solid var(--border);border-radius:12px;padding:13px 14px;margin-bottom:9px;display:flex;align-items:center;gap:10px;cursor:pointer;}
+.im-item:active{border-color:var(--accent);}
+.im-info{flex:1;}.im-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;}.im-net{font-size:12px;color:var(--green);margin-top:2px;}.im-arrow{color:var(--accent);font-size:18px;}
+.im-empty{text-align:center;color:var(--muted);font-size:13px;padding:30px 0;}
+.im-cancel{width:100%;border:none;border-radius:12px;background:rgba(255,255,255,.07);color:var(--text);font-family:'Syne',sans-serif;font-size:14px;font-weight:700;padding:14px;margin-top:12px;cursor:pointer;}
+.arch-hdr{background:#161b27;padding:20px 16px 16px;border-bottom:1px solid var(--border);}
+.arch-hdr h2{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;}.arch-hdr p{font-size:12px;color:var(--muted);margin-top:4px;}
+.arch-content{padding:14px;}
+.arch-empty{text-align:center;color:var(--muted);padding:60px 20px;}
+.arch-empty div{font-size:36px;margin-bottom:12px;}.arch-empty p{font-size:13px;}
+.acard{background:var(--card);border:1px solid var(--border);border-radius:16px;margin-bottom:14px;overflow:hidden;}
+.acard-top{padding:14px 14px 12px;display:flex;align-items:center;gap:10px;}
+.acard-icon{width:42px;height:42px;border-radius:12px;background:rgba(79,142,247,.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.acard-info{flex:1;}.acard-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;}.acard-net{font-size:12px;color:var(--green);margin-top:2px;}.acard-date{font-size:10px;color:var(--muted);margin-top:1px;}
+.acard-acts{display:flex;border-top:1px solid var(--border);}
+.aact{flex:1;border:none;background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;padding:11px 4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;border-right:1px solid var(--border);}
+.aact:last-child{border-right:none;}.aact:active{background:rgba(255,255,255,.05);}
+.aact-ic{font-size:16px;}
+#moveModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:910;align-items:flex-end;justify-content:center;}
+#moveModal.on{display:flex;}
+.mv-sheet{background:#1c2333;border:1px solid var(--border);border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:20px 16px 36px;}
+.mv-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:6px;}
+.mv-sub{font-size:12px;color:var(--muted);margin-bottom:16px;}
+.mv-cancel{width:100%;border:none;border-radius:12px;background:rgba(255,255,255,.07);color:var(--text);font-family:'Syne',sans-serif;font-size:14px;font-weight:700;padding:14px;cursor:pointer;}
+.prof-hdr{background:#161b27;padding:20px 16px 16px;border-bottom:1px solid var(--border);}
+.prof-hdr h2{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;}
+.prof-content{padding:20px 16px;}
+.prof-av{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--green));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:#fff;margin:0 auto 16px;}
+.prof-name{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;text-align:center;margin-bottom:4px;}
+.prof-email{font-size:13px;color:var(--muted);text-align:center;margin-bottom:24px;}
+.prof-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:14px;}
+.prof-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);}
+.prof-row:last-child{border-bottom:none;}
+.prof-lbl{font-size:12px;color:var(--muted);}.prof-val{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;}
+.logout-btn{width:100%;border:1px solid rgba(255,107,107,.3);border-radius:12px;background:rgba(255,107,107,.12);color:var(--red);font-family:'Syne',sans-serif;font-size:14px;font-weight:700;padding:14px;cursor:pointer;margin-top:10px;}
+.logout-btn:active{opacity:.8;}
+</style>
+</head>
+<body>
 
-\f0\fs24 \cf0 <!DOCTYPE html>\
-<html lang="pt-BR">\
-<head>\
-<meta charset="UTF-8">\
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">\
-<title>Sal\'e1rio Organizer</title>\
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">\
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>\
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>\
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>\
-<style>\
-:root\{--bg:#0e1117;--card:#1c2333;--border:#2a3347;--accent:#4f8ef7;--green:#38d9a9;--yellow:#ffd43b;--red:#ff6b6b;--text:#e8edf5;--muted:#6b7a99;\}\
-*\{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;\}\
-body\{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);max-width:430px;margin:0 auto;padding-bottom:100px;\}\
-.screen\{display:none;\}.screen.active\{display:block;\}\
-#loginScreen\{min-height:100vh;display:none;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;\}\
-#loginScreen.active\{display:flex;\}\
-.login-logo\{width:72px;height:72px;background:linear-gradient(135deg,#1a2f50,#2a4a7a);border:2px solid rgba(79,142,247,.4);border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:34px;margin-bottom:24px;box-shadow:0 8px 32px rgba(79,142,247,.2);\}\
-.login-title\{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;text-align:center;margin-bottom:6px;\}\
-.login-title span\{color:var(--accent);\}\
-.login-sub\{font-size:13px;color:var(--muted);text-align:center;margin-bottom:32px;line-height:1.5;\}\
-.login-card\{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:24px;width:100%;max-width:360px;\}\
-.lf\{margin-bottom:14px;\}\
-.lf label\{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;font-weight:600;\}\
-.lf input\{width:100%;background:#131d30;border:1px solid var(--border);border-radius:11px;padding:13px 14px;color:var(--text);font-size:15px;font-family:'DM Sans',sans-serif;outline:none;-webkit-appearance:none;transition:border-color .2s;\}\
-.lf input:focus\{border-color:var(--accent);\}\
-.lf input::placeholder\{color:var(--muted);\}\
-.pass-wrap\{position:relative;\}\
-.pass-wrap input\{padding-right:44px;\}\
-.pass-eye\{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;line-height:1;\}\
-.login-btn\{width:100%;border:none;border-radius:13px;padding:15px;color:#fff;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;cursor:pointer;margin-top:6px;background:var(--accent);\}\
-.login-btn:active\{opacity:.8;\}\
-.login-toggle\{text-align:center;margin-top:14px;font-size:12px;color:var(--muted);\}\
-.login-toggle span\{color:var(--accent);cursor:pointer;font-weight:600;\}\
-.login-err\{font-size:12px;color:var(--red);text-align:center;margin-top:10px;min-height:16px;\}\
-.login-footer\{font-size:11px;color:var(--muted);text-align:center;margin-top:20px;line-height:1.6;\}\
-#appScreen\{display:none;\}\
-#appScreen.active\{display:block;\}\
-.tabbar\{position:sticky;top:0;z-index:50;background:#131b2e;border-bottom:1px solid var(--border);display:flex;\}\
-.tab\{flex:1;padding:14px 0 12px;text-align:center;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;\}\
-.tab.active\{color:var(--accent);border-bottom-color:var(--accent);\}\
-.page\{display:none;\}.page.active\{display:block;\}\
-.hdr\{background:#161b27;padding:20px 16px 16px;border-bottom:1px solid var(--border);\}\
-.hdr-top\{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;\}\
-.hdr h1\{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;\}.hdr h1 span\{color:var(--accent);\}\
-.user-pill\{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:30px;padding:5px 12px 5px 5px;cursor:pointer;\}\
-.user-pill:active\{border-color:var(--accent);\}\
-.u-av\{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--green));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:12px;font-weight:800;color:#fff;flex-shrink:0;\}\
-.u-nm\{font-size:12px;font-weight:600;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;\}\
-#userMenu\{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:200;\}\
-#userMenu.on\{display:block;\}\
-.um-bg\{position:absolute;inset:0;\}\
-.um-box\{position:absolute;top:62px;right:16px;background:#1e2d45;border:1px solid var(--border);border-radius:16px;padding:20px;width:230px;box-shadow:0 12px 40px rgba(0,0,0,.5);\}\
-.um-name\{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;margin-bottom:2px;\}\
-.um-email\{font-size:11px;color:var(--muted);margin-bottom:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;\}\
-.um-sep\{height:1px;background:var(--border);margin-bottom:12px;\}\
-.um-item\{padding:10px 0;font-size:13px;cursor:pointer;color:var(--muted);\}\
-.um-item:active\{color:var(--text);\}\
-.um-item.logout\{color:var(--red);font-weight:700;margin-top:4px;\}\
-.month-sel\{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:7px 12px;font-size:13px;margin-bottom:14px;\}\
-.month-sel select\{background:transparent;border:none;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;\}\
-.month-sel option\{background:#1c2333;\}\
-.yr-btn\{background:none;border:none;color:var(--text);font-size:20px;cursor:pointer;padding:0 4px;\}\
-.yr-label\{font-size:13px;font-weight:700;min-width:36px;text-align:center;\}\
-.total-box\{background:#1a2f50;border:1px solid rgba(79,142,247,.35);border-radius:14px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;\}\
-.total-box .lbl\{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;\}\
-.total-box .big\{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--green);\}\
-.disc-pill\{background:rgba(255,107,107,.18);border:1px solid rgba(255,107,107,.35);color:var(--red);padding:5px 11px;border-radius:20px;font-size:12px;font-weight:600;\}\
-.content\{padding:14px;\}\
-.sec\{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin:22px 0 10px;display:flex;align-items:center;gap:8px;\}\
-.sec::after\{content:'';flex:1;height:1px;background:var(--border);\}\
-.sc\{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:13px 14px;margin-bottom:10px;position:relative;overflow:hidden;\}\
-.sc::before\{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;\}\
-.sc.dr::before\{background:var(--accent);\}.sc.rs::before\{background:var(--green);\}.sc.pl::before\{background:var(--yellow);\}\
-.sc-head\{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;\}\
-.tag\{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:3px 9px;border-radius:6px;\}\
-.tag.dr\{background:rgba(79,142,247,.15);color:var(--accent);\}.tag.rs\{background:rgba(56,217,169,.15);color:var(--green);\}.tag.pl\{background:rgba(255,212,59,.15);color:var(--yellow);\}\
-.net-v\{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;\}\
-.sc.dr .net-v\{color:var(--accent);\}.sc.rs .net-v\{color:var(--green);\}.sc.pl .net-v\{color:var(--yellow);\}\
-.sc-grid\{display:grid;grid-template-columns:1fr 72px 48px;gap:7px;align-items:end;\}\
-.fi\{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;padding:7px 9px;\}\
-.fi label\{display:block;font-size:10px;color:var(--muted);margin-bottom:3px;\}\
-.fi input[type=number]\{background:transparent;border:none;color:var(--text);font-family:'Syne',sans-serif;font-size:14px;font-weight:600;width:100%;outline:none;-webkit-appearance:none;\}\
-.fi input[type=number]::-webkit-inner-spin-button\{-webkit-appearance:none;\}\
-.chk-cell\{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;\}\
-.chk-cell span\{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;\}\
-.chk-wrap\{width:26px;height:26px;border-radius:7px;border:2px solid var(--border);background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;\}\
-.chk-wrap.on\{background:var(--green);border-color:var(--green);\}\
-.chk-wrap svg\{display:none;width:14px;height:14px;\}.chk-wrap.on svg\{display:block;\}\
-.tbar\{background:#131d30;border:1px solid rgba(79,142,247,.2);border-radius:14px;padding:14px;margin:14px 0;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center;\}\
-.ti .lbl\{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px;\}\
-.ti .val\{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;\}\
-.isec\{background:#111827;border-top:2px solid var(--border);margin:20px -14px 0;padding:18px 14px;\}\
-.iblk\{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:13px 14px;margin-bottom:12px;\}\
-.iblk-title\{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:11px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;\}\
-.dot8\{width:8px;height:8px;border-radius:50%;flex-shrink:0;\}\
-.avail\{margin-left:auto;font-size:11px;font-weight:600;border-radius:8px;padding:2px 8px;background:rgba(56,217,169,.12);border:1px solid rgba(56,217,169,.25);color:var(--green);\}\
-.br\{display:flex;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);gap:6px;\}\
-.br:last-of-type\{border-bottom:none;\}\
-.bn\{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:500;flex:1;\}\
-.bd\{width:9px;height:9px;border-radius:2px;flex-shrink:0;\}\
-.bw\{display:flex;align-items:center;gap:2px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:7px;padding:5px 7px;flex:1;max-width:110px;\}\
-.bw span\{font-size:10px;color:var(--muted);\}\
-.bw input\{background:transparent;border:none;color:var(--text);font-family:'Syne',sans-serif;font-size:13px;font-weight:600;width:100%;outline:none;text-align:right;-webkit-appearance:none;\}\
-.bw input::-webkit-inner-spin-button\{-webkit-appearance:none;\}\
-.bpct\{font-size:10px;color:var(--muted);min-width:26px;text-align:right;flex-shrink:0;\}\
-.cust-row\{border-top:1px solid var(--border);padding-top:9px;margin-top:6px;\}\
-.cust-lbl\{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px;\}\
-.cust-grid\{display:grid;grid-template-columns:1fr 52px 100px 34px;gap:5px;align-items:end;\}\
-.cf\{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:7px;padding:6px 8px;\}\
-.cf label\{display:block;font-size:10px;color:var(--muted);margin-bottom:2px;\}\
-.cf input\{background:transparent;border:none;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;width:100%;outline:none;-webkit-appearance:none;\}\
-.cf input::-webkit-inner-spin-button\{-webkit-appearance:none;\}\
-.sub-blk\{border:1px solid var(--border);border-radius:9px;overflow:hidden;margin-top:9px;\}\
-.sub-hdr\{background:rgba(79,142,247,.09);border-bottom:1px solid var(--border);padding:7px 11px;font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;\}\
-.sub-row\{display:grid;grid-template-columns:1fr 100px 34px;gap:5px;align-items:end;padding:7px 11px;border-bottom:1px solid rgba(42,51,71,.5);\}\
-.sub-row:last-child\{border-bottom:none;\}\
-.sf\{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;padding:5px 7px;\}\
-.sf label\{display:block;font-size:10px;color:var(--muted);margin-bottom:2px;\}\
-.sf input\{background:transparent;border:none;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;width:100%;outline:none;-webkit-appearance:none;\}\
-.sf input::-webkit-inner-spin-button\{-webkit-appearance:none;\}\
-.warn\{font-size:11px;color:var(--red);text-align:center;margin-top:7px;display:none;padding:6px;background:rgba(255,107,107,.09);border-radius:7px;\}\
-.warn.on\{display:block;\}\
-.btn-row\{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px;\}\
-.btn\{width:100%;border:none;border-radius:12px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;padding:15px;cursor:pointer;-webkit-appearance:none;\}\
-.btn:active\{opacity:.8;\}.btn:disabled\{opacity:.45;pointer-events:none;\}\
-.btn.pri\{background:var(--accent);color:#fff;\}\
-.btn.sec\{background:rgba(56,217,169,.15);border:1px solid rgba(56,217,169,.3);color:var(--green);\}\
-.btn.imp\{background:rgba(255,212,59,.12);border:1px solid rgba(255,212,59,.3);color:var(--yellow);width:100%;margin-top:10px;\}\
-.btn.pdf\{background:#1e3a5f;border:1px solid rgba(79,142,247,.45);color:var(--accent);width:100%;margin-top:10px;\}\
-.status\{font-size:12px;color:var(--muted);text-align:center;margin-top:10px;min-height:18px;\}\
-#overlay\{display:none;position:fixed;inset:0;background:rgba(10,14,22,.92);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:14px;backdrop-filter:blur(4px);\}\
-#overlay.on\{display:flex;\}\
-.ring\{width:46px;height:46px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:sp .8s linear infinite;\}\
-@keyframes sp\{to\{transform:rotate(360deg);\}\}\
-.ov-msg\{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;\}.ov-sub\{font-size:12px;color:var(--muted);\}\
-#preview\{display:none;position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:1000;flex-direction:column;\}\
-#preview.on\{display:flex;\}\
-.pv-bar\{background:#1a2540;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0;\}\
-.pv-title\{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;\}\
-.pv-close\{background:rgba(255,255,255,.1);border:none;color:var(--text);font-size:16px;width:32px;height:32px;border-radius:8px;cursor:pointer;\}\
-.pv-scroll\{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;align-items:center;\}\
-.pv-scroll img\{max-width:100%;border-radius:6px;\}\
-.pv-actions\{background:#1a2540;border-top:1px solid var(--border);padding:14px 16px;display:flex;gap:10px;flex-shrink:0;\}\
-.pv-btn\{flex:1;border:none;border-radius:11px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;padding:14px;cursor:pointer;\}\
-.pv-btn.dl\{background:var(--green);color:#071510;\}.pv-btn.cl\{background:rgba(255,255,255,.08);border:1px solid var(--border);color:var(--text);\}\
-#importModal\{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:900;align-items:flex-end;justify-content:center;\}\
-#importModal.on\{display:flex;\}\
-.im-sheet\{background:#1c2333;border:1px solid var(--border);border-radius:20px 20px 0 0;width:100%;max-width:430px;max-height:80vh;overflow-y:auto;padding:20px 16px 36px;\}\
-.im-title\{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:6px;\}\
-.im-sub\{font-size:12px;color:var(--muted);margin-bottom:18px;\}\
-.im-item\{background:#131d30;border:1px solid var(--border);border-radius:12px;padding:13px 14px;margin-bottom:9px;display:flex;align-items:center;gap:10px;cursor:pointer;\}\
-.im-item:active\{border-color:var(--accent);\}\
-.im-info\{flex:1;\}.im-name\{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;\}.im-net\{font-size:12px;color:var(--green);margin-top:2px;\}.im-arrow\{color:var(--accent);font-size:18px;\}\
-.im-empty\{text-align:center;color:var(--muted);font-size:13px;padding:30px 0;\}\
-.im-cancel\{width:100%;border:none;border-radius:12px;background:rgba(255,255,255,.07);color:var(--text);font-family:'Syne',sans-serif;font-size:14px;font-weight:700;padding:14px;margin-top:12px;cursor:pointer;\}\
-.arch-hdr\{background:#161b27;padding:20px 16px 16px;border-bottom:1px solid var(--border);\}\
-.arch-hdr h2\{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;\}.arch-hdr p\{font-size:12px;color:var(--muted);margin-top:4px;\}\
-.arch-content\{padding:14px;\}\
-.arch-empty\{text-align:center;color:var(--muted);padding:60px 20px;\}\
-.arch-empty div\{font-size:36px;margin-bottom:12px;\}.arch-empty p\{font-size:13px;\}\
-.acard\{background:var(--card);border:1px solid var(--border);border-radius:16px;margin-bottom:14px;overflow:hidden;\}\
-.acard-top\{padding:14px 14px 12px;display:flex;align-items:center;gap:10px;\}\
-.acard-icon\{width:42px;height:42px;border-radius:12px;background:rgba(79,142,247,.15);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;\}\
-.acard-info\{flex:1;\}.acard-name\{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;\}.acard-net\{font-size:12px;color:var(--green);margin-top:2px;\}.acard-date\{font-size:10px;color:var(--muted);margin-top:1px;\}\
-.acard-acts\{display:flex;border-top:1px solid var(--border);\}\
-.aact\{flex:1;border:none;background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;padding:11px 4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;border-right:1px solid var(--border);\}\
-.aact:last-child\{border-right:none;\}.aact:active\{background:rgba(255,255,255,.05);\}\
-.aact-ic\{font-size:16px;\}\
-#moveModal\{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:910;align-items:flex-end;justify-content:center;\}\
-#moveModal.on\{display:flex;\}\
-.mv-sheet\{background:#1c2333;border:1px solid var(--border);border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:20px 16px 36px;\}\
-.mv-title\{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:6px;\}\
-.mv-sub\{font-size:12px;color:var(--muted);margin-bottom:16px;\}\
-.mv-cancel\{width:100%;border:none;border-radius:12px;background:rgba(255,255,255,.07);color:var(--text);font-family:'Syne',sans-serif;font-size:14px;font-weight:700;padding:14px;cursor:pointer;\}\
-.prof-hdr\{background:#161b27;padding:20px 16px 16px;border-bottom:1px solid var(--border);\}\
-.prof-hdr h2\{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;\}\
-.prof-content\{padding:20px 16px;\}\
-.prof-av\{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--green));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:#fff;margin:0 auto 16px;\}\
-.prof-name\{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;text-align:center;margin-bottom:4px;\}\
-.prof-email\{font-size:13px;color:var(--muted);text-align:center;margin-bottom:24px;\}\
-.prof-card\{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:14px;\}\
-.prof-row\{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);\}\
-.prof-row:last-child\{border-bottom:none;\}\
-.prof-lbl\{font-size:12px;color:var(--muted);\}.prof-val\{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;\}\
-.logout-btn\{width:100%;border:1px solid rgba(255,107,107,.3);border-radius:12px;background:rgba(255,107,107,.12);color:var(--red);font-family:'Syne',sans-serif;font-size:14px;font-weight:700;padding:14px;cursor:pointer;margin-top:10px;\}\
-.logout-btn:active\{opacity:.8;\}\
-</style>\
-</head>\
-<body>\
-\
-<div id="overlay"><div class="ring"></div><div class="ov-msg" id="ovMsg">Carregando\'85</div><div class="ov-sub" id="ovSub">Aguarde</div></div>\
-\
-<div id="preview">\
-  <div class="pv-bar"><div class="pv-title" id="pvTitle">Extrato</div><button class="pv-close" onclick="closePreview()">\uc0\u10005 </button></div>\
-  <div class="pv-scroll" id="pvScroll"></div>\
-  <div class="pv-actions"><button class="pv-btn dl" onclick="downloadPDF()">\uc0\u11015  Baixar PDF</button><button class="pv-btn cl" onclick="closePreview()">Fechar</button></div>\
-</div>\
-\
-<div id="importModal">\
-  <div class="im-sheet">\
-    <div class="im-title">\uc0\u55357 \u56514  Importar M\'eas</div>\
-    <div class="im-sub">Selecione um m\'eas para carregar edit\'e1vel</div>\
-    <div id="imList"></div>\
-    <button class="im-cancel" onclick="closeImport()">Cancelar</button>\
-  </div>\
-</div>\
-\
-<div id="moveModal">\
-  <div class="mv-sheet">\
-    <div class="mv-title">\uc0\u8597  Mover M\'eas</div>\
-    <div class="mv-sub" id="mvSub">Escolha o novo per\'edodo</div>\
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">\
-      <div class="cf"><label>M\'eas</label>\
-        <select id="mvMon" style="background:transparent;border:none;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;width:100%;outline:none;">\
-          <option value="0">Janeiro</option><option value="1">Fevereiro</option><option value="2">Mar\'e7o</option>\
-          <option value="3">Abril</option><option value="4">Maio</option><option value="5">Junho</option>\
-          <option value="6">Julho</option><option value="7">Agosto</option><option value="8">Setembro</option>\
-          <option value="9">Outubro</option><option value="10">Novembro</option><option value="11">Dezembro</option>\
-        </select>\
-      </div>\
-      <div class="cf"><label>Ano</label><input type="number" id="mvYr" style="background:transparent;border:none;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;width:100%;outline:none;-webkit-appearance:none;"></div>\
-    </div>\
-    <button class="btn pri" style="margin-bottom:10px" onclick="confirmMove()">\uc0\u9989  Confirmar</button>\
-    <button class="mv-cancel" onclick="document.getElementById('moveModal').classList.remove('on')">Cancelar</button>\
-  </div>\
-</div>\
-\
-<div id="userMenu">\
-  <div class="um-bg" onclick="document.getElementById('userMenu').classList.remove('on')"></div>\
-  <div class="um-box">\
-    <div class="um-name" id="umName"></div>\
-    <div class="um-email" id="umEmail"></div>\
-    <div class="um-sep"></div>\
-    <div class="um-item" onclick="goProf()">\uc0\u55357 \u56420  Meu Perfil</div>\
-    <div class="um-sep"></div>\
-    <div class="um-item logout" onclick="logout()">\uc0\u55357 \u57002  Sair da Conta</div>\
-  </div>\
-</div>\
-\
-<!-- LOGIN -->\
-<div id="loginScreen" class="active">\
-  <div class="login-logo">\uc0\u55357 \u56496 </div>\
-  <div class="login-title">Sal\'e1rio <span>Organizer</span></div>\
-  <div class="login-sub">Gest\'e3o financeira pessoal.<br>Entre com sua conta para come\'e7ar.</div>\
-  <div class="login-card">\
-    <div id="nameField" class="lf" style="display:none;"><label>Nome completo</label><input type="text" id="inName" placeholder="Thiago Silva" autocomplete="name"></div>\
-    <div class="lf"><label>E-mail</label><input type="email" id="inEmail" placeholder="thiago@email.com" autocomplete="email"></div>\
-    <div class="lf"><label>Senha</label>\
-      <div class="pass-wrap">\
-        <input type="password" id="inPass" placeholder="\'95\'95\'95\'95\'95\'95\'95\'95" autocomplete="current-password">\
-        <button class="pass-eye" onclick="var f=document.getElementById('inPass');f.type=f.type==='password'?'text':'password';this.textContent=f.type==='password'?'\uc0\u55357 \u56385 ':'\u55357 \u56904 '">\u55357 \u56385 </button>\
-      </div>\
-    </div>\
-    <button class="login-btn" id="loginBtn" onclick="handleAuth()">\uc0\u55357 \u56592  Entrar</button>\
-    <div class="login-toggle" id="loginToggle">N\'e3o tem conta? <span onclick="setMode(true)">Criar conta</span></div>\
-    <div class="login-err" id="loginErr"></div>\
-  </div>\
-  <div class="login-footer">\uc0\u55357 \u56594  Dados salvos com seguran\'e7a na nuvem.<br>Acesse de qualquer dispositivo.</div>\
-</div>\
-\
-<!-- APP -->\
-<div id="appScreen">\
-  <div class="tabbar">\
-    <div class="tab active" id="tab-main" onclick="gotoTab('main')">\uc0\u55357 \u56522  Principal</div>\
-    <div class="tab" id="tab-arch" onclick="gotoTab('arch')">\uc0\u55357 \u56513  Anteriores</div>\
-    <div class="tab" id="tab-prof" onclick="gotoTab('prof')">\uc0\u55357 \u56420  Perfil</div>\
-  </div>\
-\
-  <div class="page active" id="page-main">\
-    <div id="capture">\
-      <div class="hdr">\
-        <div class="hdr-top">\
-          <h1>Sal\'e1rio <span>Organizer</span></h1>\
-          <div class="user-pill" onclick="document.getElementById('userMenu').classList.toggle('on')">\
-            <div class="u-av" id="hdrAv">?</div>\
-            <div class="u-nm" id="hdrNm">\'97</div>\
-          </div>\
-        </div>\
-        <div class="month-sel">\
-          <span>\uc0\u55357 \u56517 </span>\
-          <select id="mSel" onchange="CM=parseInt(this.value);loadMonth()">\
-            <option value="0">Janeiro</option><option value="1">Fevereiro</option><option value="2">Mar\'e7o</option>\
-            <option value="3">Abril</option><option value="4">Maio</option><option value="5">Junho</option>\
-            <option value="6">Julho</option><option value="7">Agosto</option><option value="8">Setembro</option>\
-            <option value="9">Outubro</option><option value="10">Novembro</option><option value="11">Dezembro</option>\
-          </select>\
-          <span style="width:1px;height:13px;background:var(--border);display:inline-block;"></span>\
-          <button class="yr-btn" onclick="CY--;document.getElementById('yrLbl').textContent=CY;loadMonth()">\'8b</button>\
-          <span class="yr-label" id="yrLbl">2026</span>\
-          <button class="yr-btn" onclick="CY++;document.getElementById('yrLbl').textContent=CY;loadMonth()">\'9b</button>\
-        </div>\
-        <div class="total-box">\
-          <div><div class="lbl">\uc0\u55357 \u56496  L\'edquido Total Mensal</div><div class="big" id="totalNet">R$ 0,00</div></div>\
-          <div class="disc-pill" id="totalDisc">- R$ 0,00</div>\
-        </div>\
-      </div>\
-      <div class="content">\
-        <div class="sec">\uc0\u55357 \u56549  Entrada de Sal\'e1rios</div>\
-        <div class="sc dr">\
-          <div class="sc-head"><span class="tag dr">\uc0\u55356 \u57314  Rede Dor</span><span class="net-v" id="dNet">R$ 0,00</span></div>\
-          <div class="sc-grid">\
-            <div class="fi"><label>Bruto R$</label><input type="number" id="dBruto" placeholder="0" inputmode="decimal" oninput="calc()"></div>\
-            <div class="fi"><label>Desc %</label><input type="number" id="dDesc" placeholder="0" inputmode="decimal" oninput="calc()"></div>\
-            <div class="chk-cell"><span>Recebido</span><div class="chk-wrap" id="ck_dOk" onclick="tck('dOk')"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3" stroke="#071510" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>\
-          </div>\
-        </div>\
-        <div class="sc rs">\
-          <div class="sc-head"><span class="tag rs">\uc0\u55356 \u57317  Resid\'eancia</span><span class="net-v" id="rNet">R$ 0,00</span></div>\
-          <div class="sc-grid">\
-            <div class="fi"><label>Bruto R$</label><input type="number" id="rBruto" placeholder="0" inputmode="decimal" oninput="calc()"></div>\
-            <div class="fi"><label>Desc %</label><input type="number" id="rDesc" placeholder="0" inputmode="decimal" oninput="calc()"></div>\
-            <div class="chk-cell"><span>Recebido</span><div class="chk-wrap" id="ck_rOk" onclick="tck('rOk')"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3" stroke="#071510" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>\
-          </div>\
-        </div>\
-        <div class="sc pl">\
-          <div class="sc-head"><span class="tag pl">\uc0\u9889  Plant\'f5es</span><span class="net-v" id="pNet">R$ 0,00</span></div>\
-          <div id="planWrap"></div>\
-        </div>\
-        <div class="sc" style="border-left:3px solid #a78bfa;">\
-          <div class="sc-head" style="margin-bottom:10px;">\
-            <div style="display:flex;align-items:center;gap:8px;flex:1;">\
-              <span class="tag" style="background:rgba(167,139,250,.15);color:#a78bfa;">\uc0\u10024  Extra</span>\
-              <input type="text" id="extraNome" placeholder="Descri\'e7\'e3o\'85" style="background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:7px;padding:4px 8px;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;flex:1;-webkit-appearance:none;">\
-            </div>\
-            <span class="net-v" id="eNet" style="color:#a78bfa;margin-left:10px;">R$ 0,00</span>\
-          </div>\
-          <div class="sc-grid">\
-            <div class="fi"><label>Bruto R$</label><input type="number" id="eBruto" placeholder="0" inputmode="decimal" oninput="calc()"></div>\
-            <div class="fi"><label>Desc %</label><input type="number" id="eDesc" placeholder="0" inputmode="decimal" oninput="calc()"></div>\
-            <div class="chk-cell"><span>Recebido</span><div class="chk-wrap" id="ck_eOk" onclick="tck('eOk')"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3" stroke="#071510" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>\
-          </div>\
-        </div>\
-        <div class="tbar">\
-          <div class="ti"><div class="lbl">\uc0\u55356 \u57314  Door</div><div class="val" style="color:var(--accent)" id="bDoor">R$0</div></div>\
-          <div class="ti"><div class="lbl">\uc0\u55356 \u57317  Resid\'eancia</div><div class="val" style="color:var(--green)" id="bResid">R$0</div></div>\
-          <div class="ti"><div class="lbl">\uc0\u9889  Plant\'f5es</div><div class="val" style="color:var(--yellow)" id="bPlan">R$0</div></div>\
-        </div>\
-        <div class="isec">\
-          <div class="sec" style="margin-top:0">\uc0\u55357 \u56522  Aplica\'e7\'e3o dos Recursos</div>\
-          <div class="iblk">\
-            <div class="iblk-title"><div class="dot8" style="background:var(--green)"></div>Resid\'eancia<span class="avail" id="rAvail">R$ 0,00</span></div>\
-            <div class="br"><div class="bn"><div class="bd" style="background:#ff6600"></div>Ita\'fa</div><div class="bw"><span>R$</span><input type="number" id="rItau" placeholder="0" inputmode="decimal" oninput="calcI()"></div><div class="bpct" id="rItauP">0%</div><div class="chk-wrap" id="ck_rItau" onclick="tck('rItau')"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3" stroke="#071510" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>\
-            <div class="br"><div class="bn"><div class="bd" style="background:#8a05be"></div>Nubank</div><div class="bw"><span>R$</span><input type="number" id="rNu" placeholder="0" inputmode="decimal" oninput="calcI()"></div><div class="bpct" id="rNuP">0%</div><div class="chk-wrap" id="ck_rNu" onclick="tck('rNu')"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3" stroke="#071510" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>\
-            <div class="br" style="border-bottom:none"><div class="bn"><div class="bd" style="background:#cc0000"></div>Bradesco</div><div class="bw"><span>R$</span><input type="number" id="rBrad" placeholder="0" inputmode="decimal" oninput="calcI()"></div><div class="bpct" id="rBradP">0%</div><div class="chk-wrap" id="ck_rBrad" onclick="tck('rBrad')"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3" stroke="#071510" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>\
-            <div class="cust-row"><div class="cust-lbl">\uc0\u9999 \u65039  Personalizado</div>\
-              <div class="cust-grid">\
-                <div class="cf"><label>Nome</label><input type="text" id="rCNome" placeholder="CDB\'85"></div>\
-                <div class="cf"><label>%</label><input type="number" id="rCPct" placeholder="0" inputmode="decimal" oninput="calcI()"></div>\
-                <div class="cf"><label>Valor R$</label><input type="number" id="rCVal" placeholder="0" inputmode="decimal" oninput="calcI()"></div>\
-                <div class="chk-wrap" id="ck_rCust" onclick="tck('rCust')" style="margin-bottom:2px"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3" stroke="#071510" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>\
-              </div>\
-            </div>\
-            <div class="warn" id="rWarn">\uc0\u9888 \u65039  Valor superior ao dispon\'edvel</div>\
-          </div>\
-          <div class="iblk">\
-            <div class="iblk-title"><div class="dot8" style="background:var(--accent)"></div>Rede Dor + Plant\'f5es + Extra<span class="avail" id="dAvail">R$ 0,00</span></div>\
-            <div class="br"><div class="bn"><div class="bd" style="background:#cc0000"></div>Bradesco</div><div class="bw"><span>R$</span><input type="number" id="iBrad" placeholder="0" inputmode="decimal" oninput="calcI()"></div><div class="bpct" id="iBradP">0%</div><div class="chk-wrap" id="ck_iBrad" onclick="tck('iBrad')"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3" stroke="#071510" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>\
-            <div class="br"><div class="bn"><div class="bd" style="background:#ff6600"></div>Ita\'fa</div><div class="bw"><span>R$</span><input type="number" id="iItau" placeholder="0" inputmode="decimal" oninput="calcI()"></div><div class="bpct" id="iItauP">0%</div><div class="chk-wrap" id="ck_iItau" onclick="tck('iItau')"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3" stroke="#071510" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>\
-            <div class="br" style="border-bottom:none"><div class="bn"><div class="bd" style="background:#ec0000"></div>Santander</div><div class="bw"><span>R$</span><input type="number" id="iSant" placeholder="0" inputmode="decimal" oninput="calcI()"></div><div class="bpct" id="iSantP">0%</div><div class="chk-wrap" id="ck_iSant" onclick="tck('iSant')"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3" stroke="#071510" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>\
-            <div class="sub-blk">\
-              <div class="sub-hdr">\uc0\u55357 \u56520  Investimentos</div>\
-              <div class="sub-row"><div class="sf"><label>Investimento 1</label><input type="text" id="i1n" placeholder="Tesouro Direto"></div><div class="sf"><label>Valor R$</label><input type="number" id="i1v" placeholder="0" inputmode="decimal" oninput="calcI()"></div><div class="chk-wrap" id="ck_i1" onclick="tck('i1')"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3" stroke="#071510" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>\
-              <div class="sub-row"><div class="sf"><label>Investimento 2</label><input type="text" id="i2n" placeholder="LCI"></div><div class="sf"><label>Valor R$</label><input type="number" id="i2v" placeholder="0" inputmode="decimal" oninput="calcI()"></div><div class="chk-wrap" id="ck_i2" onclick="tck('i2')"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3" stroke="#071510" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>\
-              <div class="sub-row"><div class="sf"><label>Investimento 3</label><input type="text" id="i3n" placeholder="CDB"></div><div class="sf"><label>Valor R$</label><input type="number" id="i3v" placeholder="0" inputmode="decimal" oninput="calcI()"></div><div class="chk-wrap" id="ck_i3" onclick="tck('i3')"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3" stroke="#071510" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>\
-              <div class="sub-row"><div class="sf"><label>Investimento 4</label><input type="text" id="i4n" placeholder="A\'e7\'f5es"></div><div class="sf"><label>Valor R$</label><input type="number" id="i4v" placeholder="0" inputmode="decimal" oninput="calcI()"></div><div class="chk-wrap" id="ck_i4" onclick="tck('i4')"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3" stroke="#071510" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>\
-              <div class="sub-row"><div class="sf"><label>Investimento 5</label><input type="text" id="i5n" placeholder="FII"></div><div class="sf"><label>Valor R$</label><input type="number" id="i5v" placeholder="0" inputmode="decimal" oninput="calcI()"></div><div class="chk-wrap" id="ck_i5" onclick="tck('i5')"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3" stroke="#071510" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>\
-            </div>\
-            <div class="warn" id="dWarn">\uc0\u9888 \u65039  Valor superior ao dispon\'edvel</div>\
-          </div>\
-        </div>\
-      </div>\
-    </div>\
-    <div style="padding:0 14px;">\
-      <div class="btn-row">\
-        <button class="btn pri" onclick="saveMes()">\uc0\u55357 \u56510  Salvar M\'eas</button>\
-        <button class="btn sec" onclick="acumular()">\uc0\u10133  Acumular</button>\
-      </div>\
-      <button class="btn imp" onclick="openImport()">\uc0\u55357 \u56514  Importar M\'eas Salvo</button>\
-      <button class="btn pdf" id="btnPDF" onclick="gerarPDF()">\uc0\u55357 \u56516  Exportar PDF</button>\
-      <div class="status" id="status"></div>\
-    </div>\
-  </div>\
-\
-  <div class="page" id="page-arch">\
-    <div class="arch-hdr"><h2>\uc0\u55357 \u56513  Meses Anteriores</h2><p>Edite, exporte ou reorganize seus meses salvos.</p></div>\
-    <div class="arch-content" id="archContent"></div>\
-  </div>\
-\
-  <div class="page" id="page-prof">\
-    <div class="prof-hdr"><h2>\uc0\u55357 \u56420  Meu Perfil</h2></div>\
-    <div class="prof-content">\
-      <div class="prof-av" id="profAv">?</div>\
-      <div class="prof-name" id="profName">\'97</div>\
-      <div class="prof-email" id="profEmail">\'97</div>\
-      <div class="prof-card">\
-        <div class="prof-row"><span class="prof-lbl">Meses salvos</span><span class="prof-val" id="profCount">0</span></div>\
-        <div class="prof-row"><span class="prof-lbl">Membro desde</span><span class="prof-val" id="profSince">\'97</span></div>\
-      </div>\
-      <button class="logout-btn" onclick="logout()">\uc0\u55357 \u57002  Sair da Conta</button>\
-    </div>\
-  </div>\
-</div>\
-\
-<script>\
-// \uc0\u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \
-// \uc0\u9888 \u65039   SUBSTITUA AQUI pelas suas chaves do Supabase\
-// \uc0\u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \
-var SUPA_URL = '
-\f1\fs26 https://gsxdsludajbepmddwhhf.supabase.co/rest/v1/
-\f0\fs24 ';\
-var SUPA_KEY = '
-\f1\fs26 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzeGRzbHVkYWpiZXBtZGR3aGhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1NTA3MTIsImV4cCI6MjA5NDEyNjcxMn0.SUyaSj7BB_eghTUIEkwm-rpiGmPee7rERXaZrpvEwac
-\f0\fs24 ';\
-// \uc0\u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \u9552 \
-\
-var sb = supabase.createClient(SUPA_URL, SUPA_KEY);\
-var MN=['Janeiro','Fevereiro','Mar\'e7o','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];\
-var now=new Date(), CM=now.getMonth(), CY=now.getFullYear();\
-var _pdfBlob=null, _pdfName='', _moveKey=null;\
-var CKS=\{dOk:0,rOk:0,p1Ok:0,p2Ok:0,p3Ok:0,p4Ok:0,p5Ok:0,p6Ok:0,eOk:0,rItau:0,rNu:0,rBrad:0,rCust:0,iBrad:0,iItau:0,iSant:0,i1:0,i2:0,i3:0,i4:0,i5:0\};\
-var _regMode=false;\
-var _allMeses=[];\
-\
-// \uc0\u9552 \u9552  INIT \u9552 \u9552 \
-(async function()\{\
-  showOverlay('Verificando sess\'e3o\'85');\
-  var \{data:\{session\}\} = await sb.auth.getSession();\
-  hideOverlay();\
-  if(session)\{\
-    await gotoApp(session.user);\
-  \} else \{\
-    showLogin();\
-  \}\
-  sb.auth.onAuthStateChange(async function(event,session)\{\
-    if(event==='SIGNED_IN' && session)\{ await gotoApp(session.user); \}\
-    if(event==='SIGNED_OUT')\{ showLogin(); \}\
-  \});\
-\})();\
-\
-// \uc0\u9552 \u9552  AUTH \u9552 \u9552 \
-function setMode(reg)\{\
-  _regMode=reg;\
-  document.getElementById('nameField').style.display=reg?'block':'none';\
-  document.getElementById('loginBtn').textContent=reg?'\uc0\u9989  Criar Conta':'\u55357 \u56592  Entrar';\
-  document.getElementById('loginToggle').innerHTML=reg\
-    ?'J\'e1 tem conta? <span onclick="setMode(false)">Entrar</span>'\
-    :'N\'e3o tem conta? <span onclick="setMode(true)">Criar conta</span>';\
-  document.getElementById('loginErr').textContent='';\
-\}\
-\
-async function handleAuth()\{\
-  var email=(document.getElementById('inEmail').value||'').trim().toLowerCase();\
-  var pass=document.getElementById('inPass').value||'';\
-  var err=document.getElementById('loginErr');\
-  if(!email||email.indexOf('@')<1)\{err.textContent='E-mail inv\'e1lido.';return;\}\
-  if(pass.length<6)\{err.textContent='Senha m\'ednima: 6 caracteres.';return;\}\
-  document.getElementById('loginBtn').disabled=true;\
-  showOverlay(_regMode?'Criando conta\'85':'Entrando\'85');\
-  if(_regMode)\{\
-    var name=(document.getElementById('inName').value||'').trim();\
-    if(!name)\{hideOverlay();document.getElementById('loginBtn').disabled=false;err.textContent='Informe seu nome.';return;\}\
-    var \{error\}=await sb.auth.signUp(\{email,password:pass,options:\{data:\{full_name:name\}\}\});\
-    if(error)\{hideOverlay();document.getElementById('loginBtn').disabled=false;err.textContent=traduzErro(error.message);return;\}\
-    hideOverlay();document.getElementById('loginBtn').disabled=false;\
-    err.style.color='var(--green)';err.textContent='\uc0\u9989  Conta criada! Verifique seu e-mail para confirmar.';\
-  \} else \{\
-    var \{error\}=await sb.auth.signInWithPassword(\{email,password:pass\});\
-    if(error)\{hideOverlay();document.getElementById('loginBtn').disabled=false;err.textContent=traduzErro(error.message);return;\}\
-  \}\
-\}\
-\
-function traduzErro(msg)\{\
-  if(msg.includes('Invalid login'))return 'E-mail ou senha incorretos.';\
-  if(msg.includes('already registered'))return 'E-mail j\'e1 cadastrado. Fa\'e7a login.';\
-  if(msg.includes('Email not confirmed'))return 'Confirme seu e-mail antes de entrar.';\
-  if(msg.includes('rate limit'))return 'Muitas tentativas. Aguarde um momento.';\
-  return msg;\
-\}\
-\
-async function logout()\{\
-  if(!confirm('Sair da conta?'))return;\
-  document.getElementById('userMenu').classList.remove('on');\
-  await sb.auth.signOut();\
-\}\
-\
-function showLogin()\{\
-  hideOverlay();\
-  document.getElementById('loginScreen').style.display='flex';\
-  document.getElementById('appScreen').style.display='none';\
-  document.getElementById('loginScreen').classList.add('active');\
-  document.getElementById('inEmail').value='';\
-  document.getElementById('inPass').value='';\
-  document.getElementById('inName').value='';\
-  document.getElementById('loginErr').textContent='';\
-  document.getElementById('loginErr').style.color='var(--red)';\
-  document.getElementById('loginBtn').disabled=false;\
-  setMode(false);\
-  clearForm();\
-\}\
-\
-async function gotoApp(user)\{\
-  hideOverlay();\
-  var name=user.user_metadata?.full_name||user.email.split('@')[0]||'Usu\'e1rio';\
-  var ini=name.split(' ').map(function(w)\{return w[0];\}).slice(0,2).join('').toUpperCase();\
-  var fn=name.split(' ')[0];\
-  document.getElementById('hdrAv').textContent=ini;\
-  document.getElementById('hdrNm').textContent=fn;\
-  document.getElementById('umName').textContent=name;\
-  document.getElementById('umEmail').textContent=user.email;\
-  document.getElementById('profAv').textContent=ini;\
-  document.getElementById('profName').textContent=name;\
-  document.getElementById('profEmail').textContent=user.email;\
-  var since=new Date(user.created_at).toLocaleDateString('pt-BR');\
-  document.getElementById('profSince').textContent=since;\
-  document.getElementById('loginScreen').style.display='none';\
-  document.getElementById('appScreen').style.display='block';\
-  buildPlantoes();\
-  gotoTab('main');\
-  document.getElementById('mSel').value=CM;\
-  document.getElementById('yrLbl').textContent=CY;\
-  await loadMonth();\
-  await loadAllMeses();\
-\}\
-\
-// \uc0\u9552 \u9552  PLANT\'d5ES \u9552 \u9552 \
-function buildPlantoes()\{\
-  var w=document.getElementById('planWrap');\
-  w.innerHTML='';\
-  for(var i=1;i<=6;i++)\{\
-    var r=document.createElement('div');\
-    r.style.cssText='display:grid;grid-template-columns:1fr 1fr 72px 48px;gap:6px;align-items:end;margin-bottom:'+(i<6?'7':'0')+'px;';\
-    var ck='p'+i+'Ok';\
-    r.innerHTML='<div class="fi"><label>Descri\'e7\'e3o</label><input type="text" id="p'+i+'Nome" placeholder="Ex: Plant\'e3o\'85" style="background:transparent;border:none;color:var(--text);font-size:13px;font-family:\\'DM Sans\\',sans-serif;width:100%;outline:none;-webkit-appearance:none;"></div>'\
-      +'<div class="fi"><label>Bruto R$</label><input type="number" id="p'+i+'Bruto" placeholder="0" inputmode="decimal" oninput="calc()"></div>'\
-      +'<div class="fi"><label>Desc %</label><input type="number" id="p'+i+'Desc" placeholder="0" inputmode="decimal" oninput="calc()"></div>'\
-      +'<div class="chk-cell"><span>Recebido</span><div class="chk-wrap" id="ck_'+ck+'" onclick="tck(\\''+ck+'\\')"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3" stroke="#071510" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>';\
-    w.appendChild(r);\
-  \}\
-\}\
-\
-// \uc0\u9552 \u9552  TABS \u9552 \u9552 \
-function gotoTab(t)\{\
-  ['main','arch','prof'].forEach(function(n)\{\
-    document.getElementById('page-'+n).classList.toggle('active',n===t);\
-    document.getElementById('tab-'+n).classList.toggle('active',n===t);\
-  \});\
-  document.getElementById('userMenu').classList.remove('on');\
-  if(t==='arch')renderArch();\
-  if(t==='prof')document.getElementById('profCount').textContent=_allMeses.length;\
-\}\
-function goProf()\{document.getElementById('userMenu').classList.remove('on');gotoTab('prof');\}\
-\
-// \uc0\u9552 \u9552  SUPABASE: CARREGAR / SALVAR \u9552 \u9552 \
-async function loadAllMeses()\{\
-  var \{data:\{user\}\}=await sb.auth.getUser();\
-  if(!user)return;\
-  var \{data\}=await sb.from('salario_meses').select('mes,ano,dados,updated_at').eq('user_id',user.id).order('ano',\{ascending:false\}).order('mes',\{ascending:false\});\
-  _allMeses=data||[];\
-  document.getElementById('profCount').textContent=_allMeses.length;\
-\}\
-\
-async function loadMonth()\{\
-  var \{data:\{user\}\}=await sb.auth.getUser();\
-  if(!user)return;\
-  showOverlay('Carregando '+MN[CM]+'\'85');\
-  var \{data\}=await sb.from('salario_meses').select('dados').eq('user_id',user.id).eq('mes',CM).eq('ano',CY).maybeSingle();\
-  hideOverlay();\
-  setData(data?data.dados:null);\
-\}\
-\
-async function saveMes()\{\
-  var \{data:\{user\}\}=await sb.auth.getUser();\
-  if(!user)return;\
-  showOverlay('Salvando\'85');\
-  var \{error\}=await sb.from('salario_meses').upsert(\{\
-    user_id:user.id, mes:CM, ano:CY,\
-    dados:getData(),\
-    updated_at:new Date().toISOString()\
-  \},\{onConflict:'user_id,mes,ano'\});\
-  hideOverlay();\
-  if(error)\{setStatus('\uc0\u10060  Erro ao salvar: '+error.message);\}\
-  else\{setStatus('\uc0\u9989  M\'eas salvo na nuvem!');await loadAllMeses();\}\
-\}\
-\
-// \uc0\u9552 \u9552  FIELDS \u9552 \u9552 \
-var NUMS=['dBruto','dDesc','rBruto','rDesc','p1Bruto','p1Desc','p2Bruto','p2Desc','p3Bruto','p3Desc','p4Bruto','p4Desc','p5Bruto','p5Desc','p6Bruto','p6Desc','eBruto','eDesc','rItau','rNu','rBrad','rCPct','rCVal','iBrad','iItau','iSant','i1v','i2v','i3v','i4v','i5v'];\
-var TXTS=['extraNome','p1Nome','p2Nome','p3Nome','p4Nome','p5Nome','p6Nome','rCNome','i1n','i2n','i3n','i4n','i5n'];\
-var CKK=Object.keys(CKS);\
-\
-function getData()\{\
-  var o=\{ts:Date.now(),checks:\{\}\};\
-  NUMS.concat(TXTS).forEach(function(f)\{var e=document.getElementById(f);o[f]=e?e.value:'';\});\
-  CKK.forEach(function(k)\{o.checks[k]=CKS[k];\});\
-  return o;\
-\}\
-function setData(o)\{\
-  NUMS.concat(TXTS).forEach(function(f)\{var e=document.getElementById(f);if(e)e.value=o&&o[f]?o[f]:'';\});\
-  CKK.forEach(function(k)\{CKS[k]=o&&o.checks&&o.checks[k]?1:0;var e=document.getElementById('ck_'+k);if(e)e.classList.toggle('on',!!CKS[k]);\});\
-  calc();\
-\}\
-function clearForm()\{setData(null);\}\
-function tck(k)\{CKS[k]=CKS[k]?0:1;var e=document.getElementById('ck_'+k);if(e)e.classList.toggle('on',!!CKS[k]);\}\
-\
-// \uc0\u9552 \u9552  CALC \u9552 \u9552 \
-function gn(id)\{return parseFloat((document.getElementById(id)||\{\}).value)||0;\}\
-function liq(b,p)\{return b*(1-p/100);\}\
-function fmt(n)\{return 'R$ '+n.toLocaleString('pt-BR',\{minimumFractionDigits:2,maximumFractionDigits:2\});\}\
-function fmtS(n)\{return n>=1000?'R$'+(n/1000).toFixed(1)+'k':'R$'+Math.round(n);\}\
-function tx(id,v)\{var e=document.getElementById(id);if(e)e.textContent=v;\}\
-function calc()\{\
-  var dN=liq(gn('dBruto'),gn('dDesc')),rN=liq(gn('rBruto'),gn('rDesc'));\
-  var pN=[1,2,3,4,5,6].reduce(function(a,i)\{return a+liq(gn('p'+i+'Bruto'),gn('p'+i+'Desc'));\},0);\
-  var eN=liq(gn('eBruto'),gn('eDesc'));\
-  var disc=(gn('dBruto')-dN)+(gn('rBruto')-rN)+[1,2,3,4,5,6].reduce(function(a,i)\{return a+(gn('p'+i+'Bruto')-liq(gn('p'+i+'Bruto'),gn('p'+i+'Desc')));\},0)+(gn('eBruto')-eN);\
-  tx('dNet',fmt(dN));tx('rNet',fmt(rN));tx('pNet',fmt(pN));tx('eNet',fmt(eN));\
-  tx('totalNet',fmt(dN+rN+pN+eN));tx('totalDisc','- '+fmt(disc<0?0:disc));\
-  tx('bDoor',fmtS(dN));tx('bResid',fmtS(rN));tx('bPlan',fmtS(pN));\
-  calcI();\
-\}\
-function calcI()\{\
-  var rA=liq(gn('rBruto'),gn('rDesc'));\
-  var pT=[1,2,3,4,5,6].reduce(function(a,i)\{return a+liq(gn('p'+i+'Bruto'),gn('p'+i+'Desc'));\},0);\
-  var dA=liq(gn('dBruto'),gn('dDesc'))+pT+liq(gn('eBruto'),gn('eDesc'));\
-  function pct(v,t)\{return t>0?Math.round(v/t*100)+'%':'0%';\}\
-  tx('rItauP',pct(gn('rItau'),rA));tx('rNuP',pct(gn('rNu'),rA));tx('rBradP',pct(gn('rBrad'),rA));\
-  var rT=gn('rItau')+gn('rNu')+gn('rBrad')+gn('rCVal');\
-  avail('rAvail',rA-rT);tog('rWarn',rA>0&&(rA-rT)<-0.01);\
-  tx('iBradP',pct(gn('iBrad'),dA));tx('iItauP',pct(gn('iItau'),dA));tx('iSantP',pct(gn('iSant'),dA));\
-  var dT=gn('iBrad')+gn('iItau')+gn('iSant')+[1,2,3,4,5].reduce(function(a,i)\{return a+gn('i'+i+'v');\},0);\
-  avail('dAvail',dA-dT);tog('dWarn',dA>0&&(dA-dT)<-0.01);\
-\}\
-function avail(id,s)\{\
-  var e=document.getElementById(id);if(!e)return;\
-  e.textContent=(s<0?'- ':'')+fmt(Math.abs(s));\
-  if(s<0)\{e.style.background='rgba(255,107,107,.15)';e.style.borderColor='rgba(255,107,107,.35)';e.style.color='#ff6b6b';\}\
-  else if(Math.abs(s)<0.01)\{e.style.background='rgba(255,212,59,.12)';e.style.borderColor='rgba(255,212,59,.3)';e.style.color='#ffd43b';\}\
-  else\{e.style.background='rgba(56,217,169,.12)';e.style.borderColor='rgba(56,217,169,.25)';e.style.color='#38d9a9';\}\
-\}\
-function tog(id,on)\{var e=document.getElementById(id);if(e)e.classList.toggle('on',on);\}\
-function netFromObj(o)\{\
-  function g(f)\{return parseFloat(o&&o[f])||0;\}\
-  return liq(g('dBruto'),g('dDesc'))+liq(g('rBruto'),g('rDesc'))+[1,2,3,4,5,6].reduce(function(a,i)\{return a+liq(g('p'+i+'Bruto'),g('p'+i+'Desc'));\},0)+liq(g('eBruto'),g('eDesc'));\
-\}\
-\
-// \uc0\u9552 \u9552  ACUMULAR \u9552 \u9552 \
-async function acumular()\{\
-  var pm=CM-1,py=CY;if(pm<0)\{pm=11;py--;\}\
-  var \{data:\{user\}\}=await sb.auth.getUser();\
-  if(!user)return;\
-  showOverlay('Buscando m\'eas anterior\'85');\
-  var \{data\}=await sb.from('salario_meses').select('dados').eq('user_id',user.id).eq('mes',pm).eq('ano',py).maybeSingle();\
-  hideOverlay();\
-  if(!data)\{setStatus('\uc0\u9888 \u65039  M\'eas anterior n\'e3o encontrado.');return;\}\
-  var prev=data.dados;\
-  NUMS.forEach(function(f)\{var pv=parseFloat(prev[f])||0,cv=gn(f);var e=document.getElementById(f);if(e&&pv)e.value=String(pv+cv);\});\
-  calc();setStatus('\uc0\u9989  Acumulado com '+MN[pm]+'/'+py+'!');\
-\}\
-\
-// \uc0\u9552 \u9552  IMPORT \u9552 \u9552 \
-async function openImport()\{\
-  await loadAllMeses();\
-  var html='';\
-  if(!_allMeses.length)html='<div class="im-empty">Nenhum m\'eas salvo ainda.</div>';\
-  else _allMeses.forEach(function(row)\{\
-    html+='<div class="im-item" onclick="importMes('+row.mes+','+row.ano+')"><div class="im-info"><div class="im-name">'+MN[row.mes]+' '+row.ano+'</div><div class="im-net">L\'edquido: '+fmt(netFromObj(row.dados))+'</div></div><div class="im-arrow">\uc0\u8594 </div></div>';\
-  \});\
-  document.getElementById('imList').innerHTML=html;\
-  document.getElementById('importModal').classList.add('on');\
-\}\
-function closeImport()\{document.getElementById('importModal').classList.remove('on');\}\
-async function importMes(m,y)\{\
-  CM=m;CY=y;\
-  document.getElementById('mSel').value=CM;\
-  document.getElementById('yrLbl').textContent=CY;\
-  closeImport();gotoTab('main');window.scrollTo(\{top:0,behavior:'smooth'\});\
-  await loadMonth();\
-  setStatus('\uc0\u9989  '+MN[CM]+' '+CY+' importado!');\
-\}\
-\
-// \uc0\u9552 \u9552  ARCH \u9552 \u9552 \
-function renderArch()\{\
-  var el=document.getElementById('archContent');\
-  if(!_allMeses.length)\{el.innerHTML='<div class="arch-empty"><div>\uc0\u55357 \u56514 </div><p>Nenhum m\'eas salvo ainda.</p></div>';return;\}\
-  var h='';\
-  _allMeses.forEach(function(row)\{\
-    var dt=row.updated_at?new Date(row.updated_at).toLocaleDateString('pt-BR'):'\'97';\
-    h+='<div class="acard"><div class="acard-top"><div class="acard-icon">\uc0\u55357 \u56517 </div><div class="acard-info"><div class="acard-name">'+MN[row.mes]+' '+row.ano+'</div><div class="acard-net">L\'edquido: '+fmt(netFromObj(row.dados))+'</div><div class="acard-date">Salvo em: '+dt+'</div></div></div>'\
-      +'<div class="acard-acts">'\
-      +'<button class="aact" onclick="editArch('+row.mes+','+row.ano+')"><span class="aact-ic">\uc0\u9999 \u65039 </span>Editar</button>'\
-      +'<button class="aact" onclick="pdfArch('+row.mes+','+row.ano+')"><span class="aact-ic">\uc0\u55357 \u56516 </span>PDF</button>'\
-      +'<button class="aact" onclick="openMove('+row.mes+','+row.ano+')"><span class="aact-ic">\uc0\u8597 </span>Mover</button>'\
-      +'<button class="aact" onclick="delArch('+row.mes+','+row.ano+')"><span class="aact-ic">\uc0\u55357 \u56785 </span>Excluir</button>'\
-      +'</div></div>';\
-  \});\
-  el.innerHTML=h;\
-\}\
-\
-async function editArch(m,y)\{\
-  CM=m;CY=y;document.getElementById('mSel').value=CM;document.getElementById('yrLbl').textContent=CY;\
-  gotoTab('main');window.scrollTo(\{top:0,behavior:'smooth'\});\
-  await loadMonth();setStatus('\uc0\u9999 \u65039  '+MN[m]+' '+y+' carregado para edi\'e7\'e3o');\
-\}\
-\
-async function delArch(m,y)\{\
-  if(!confirm('Excluir '+MN[m]+' '+y+'?'))return;\
-  var \{data:\{user\}\}=await sb.auth.getUser();\
-  if(!user)return;\
-  showOverlay('Excluindo\'85');\
-  await sb.from('salario_meses').delete().eq('user_id',user.id).eq('mes',m).eq('ano',y);\
-  hideOverlay();\
-  await loadAllMeses();renderArch();\
-\}\
-\
-async function pdfArch(m,y)\{\
-  var oCM=CM,oCY=CY;\
-  CM=m;CY=y;document.getElementById('mSel').value=CM;document.getElementById('yrLbl').textContent=CY;\
-  await loadMonth();\
-  setTimeout(function()\{gerarPDF(async function()\{CM=oCM;CY=oCY;document.getElementById('mSel').value=CM;document.getElementById('yrLbl').textContent=CY;await loadMonth();\});\},100);\
-\}\
-\
-function openMove(m,y)\{\
-  _moveKey=\{m:m,y:y\};\
-  document.getElementById('mvSub').textContent='Movendo: '+MN[m]+' '+y;\
-  document.getElementById('mvMon').value=m;document.getElementById('mvYr').value=y;\
-  document.getElementById('moveModal').classList.add('on');\
-\}\
-\
-async function confirmMove()\{\
-  if(!_moveKey)return;\
-  var nm=parseInt(document.getElementById('mvMon').value),ny=parseInt(document.getElementById('mvYr').value)||CY;\
-  if(nm===_moveKey.m&&ny===_moveKey.y)\{document.getElementById('moveModal').classList.remove('on');return;\}\
-  var \{data:\{user\}\}=await sb.auth.getUser();if(!user)return;\
-  showOverlay('Movendo\'85');\
-  var \{data:src\}=await sb.from('salario_meses').select('dados').eq('user_id',user.id).eq('mes',_moveKey.m).eq('ano',_moveKey.y).maybeSingle();\
-  if(!src)\{hideOverlay();document.getElementById('moveModal').classList.remove('on');return;\}\
-  var exists=await sb.from('salario_meses').select('id').eq('user_id',user.id).eq('mes',nm).eq('ano',ny).maybeSingle();\
-  if(exists.data&&!confirm(MN[nm]+' '+ny+' j\'e1 existe. Substituir?'))\{hideOverlay();document.getElementById('moveModal').classList.remove('on');return;\}\
-  await sb.from('salario_meses').upsert(\{user_id:user.id,mes:nm,ano:ny,dados:src.dados,updated_at:new Date().toISOString()\},\{onConflict:'user_id,mes,ano'\});\
-  await sb.from('salario_meses').delete().eq('user_id',user.id).eq('mes',_moveKey.m).eq('ano',_moveKey.y);\
-  hideOverlay();document.getElementById('moveModal').classList.remove('on');\
-  _moveKey=null;await loadAllMeses();renderArch();\
-\}\
-\
-// \uc0\u9552 \u9552  OVERLAY \u9552 \u9552 \
-function showOverlay(msg,sub)\{\
-  document.getElementById('ovMsg').textContent=msg||'Aguarde\'85';\
-  document.getElementById('ovSub').textContent=sub||'';\
-  document.getElementById('overlay').classList.add('on');\
-\}\
-function hideOverlay()\{document.getElementById('overlay').classList.remove('on');\}\
-\
-// \uc0\u9552 \u9552  STATUS \u9552 \u9552 \
-function setStatus(msg)\{var e=document.getElementById('status');e.textContent=msg;setTimeout(function()\{e.textContent='';\},4000);\}\
-\
-// \uc0\u9552 \u9552  PDF \u9552 \u9552 \
-function gerarPDF(cb)\{\
-  var btn=document.getElementById('btnPDF');btn.disabled=true;\
-  showOverlay('Preparando PDF\'85');\
-  setTimeout(function()\{\
-    var src=document.getElementById('capture');\
-    var clone=src.cloneNode(true);\
-    src.querySelectorAll('input,select').forEach(function(el,i)\{var c=clone.querySelectorAll('input,select')[i];if(c)c.value=el.value;\});\
-    clone.querySelectorAll('input').forEach(function(inp)\{\
-      var dv=document.createElement('div');dv.textContent=inp.value||'\'97';\
-      ['color','fontFamily','fontSize','fontWeight'].forEach(function(p)\{dv.style[p]=getComputedStyle(inp)[p];\});\
-      dv.style.width='100%';inp.parentNode.replaceChild(dv,inp);\
-    \});\
-    clone.querySelectorAll('select').forEach(function(sel)\{\
-      var dv=document.createElement('div');dv.textContent=sel.options[sel.selectedIndex]?sel.options[sel.selectedIndex].text:'';\
-      dv.style.cssText='color:#e8edf5;font-size:13px;';sel.parentNode.replaceChild(dv,sel);\
-    \});\
-    clone.style.cssText='position:fixed;top:0;left:-9999px;width:430px;background:#0e1117;padding-bottom:20px;';\
-    document.body.appendChild(clone);\
-    showOverlay('Capturando tela\'85');\
-    html2canvas(clone,\{backgroundColor:'#0e1117',scale:2,useCORS:true,scrollX:0,scrollY:0,width:430,height:clone.scrollHeight,windowWidth:430,windowHeight:clone.scrollHeight,logging:false\})\
-    .then(function(canvas)\{\
-      document.body.removeChild(clone);\
-      showOverlay('Montando PDF\'85');\
-      var img=canvas.toDataURL('image/png'),pw=210,ph=Math.round(canvas.height/canvas.width*pw);\
-      var pdf=new window.jspdf.jsPDF(\{orientation:'p',unit:'mm',format:[pw,ph]\});\
-      pdf.addImage(img,'PNG',0,0,pw,ph);\
-      _pdfBlob=pdf.output('blob');_pdfName='Salario_'+MN[CM]+'_'+CY+'.pdf';\
-      document.getElementById('pvScroll').innerHTML='<img src="'+img+'" style="max-width:100%;border-radius:6px;">';\
-      document.getElementById('pvTitle').textContent='Extrato \'97 '+MN[CM]+' '+CY;\
-      hideOverlay();btn.disabled=false;\
-      document.getElementById('preview').classList.add('on');\
-      if(cb)cb();\
-    \}).catch(function()\{\
-      document.body.removeChild(clone);hideOverlay();btn.disabled=false;setStatus('\uc0\u10060  Erro ao gerar PDF.');if(cb)cb();\
-    \});\
-  \},200);\
-\}\
-function downloadPDF()\{\
-  if(!_pdfBlob)return;\
-  var url=URL.createObjectURL(_pdfBlob);\
-  if(navigator.share&&navigator.canShare)\{\
-    var f=new File([_pdfBlob],_pdfName,\{type:'application/pdf'\});\
-    if(navigator.canShare(\{files:[f]\}))\{navigator.share(\{files:[f],title:_pdfName\}).then(function()\{URL.revokeObjectURL(url);closePreview();\}).catch(function(e)\{if(e.name!=='AbortError')dl(url);\});return;\}\
-  \}\
-  dl(url);\
-\}\
-function dl(url)\{var a=document.createElement('a');a.href=url;a.download=_pdfName;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function()\{URL.revokeObjectURL(url);\},15000);closePreview();\}\
-function closePreview()\{document.getElementById('preview').classList.remove('on');\}\
-</script>\
-</body>\
-</html>}
+<div id="overlay"><div class="ring"></div><div class="ov-msg" id="ovMsg">Carregando…</div><div class="ov-sub" id="ovSub">Aguarde</div></div>
+
+<div id="preview">
+  <div class="pv-bar"><div class="pv-title" id="pvTitle">Extrato</div><button class="pv-close" onclick="closePreview()">✕</button></div>
+  <div class="pv-scroll" id="pvScroll"></div>
+  <div class="pv-actions"><button class="pv-btn dl" onclick="downloadPDF()">⬇ Baixar PDF</button><button class="pv-btn cl" onclick="closePreview()">Fechar</button></div>
+</div>
+
+<div id="importModal">
+  <div class="im-sheet">
+    <div class="im-title">📂 Importar Mês</div>
+    <div class="im-sub">Selecione um mês para carregar editável</div>
+    <div id="imList"></div>
+    <button class="im-cancel" onclick="closeImport()">Cancelar</button>
+  </div>
+</div>
+
+<div id="moveModal">
+  <div class="mv-sheet">
+    <div class="mv-title">↕ Mover Mês</div>
+    <div class="mv-sub" id="mvSub">Escolha o novo período</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
+      <div class="cf"><label>Mês</label>
+        <select id="mvMon" style="background:transparent;border:none;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;width:100%;outline:none;">
+          <option value="0">Janeiro</option><option value="1">Fevereiro</option><option value="2">Março</option>
+          <option value="3">Abril</option><option value="4">Maio</option><option value="5">Junho</option>
+          <option value="6">Julho</option><option value="7">Agosto</option><option value="8">Setembro</option>
+          <option value="9">Outubro</option><option value="10">Novembro</option><option value="11">Dezembro</option>
+        </select>
+      </div>
+      <div class="cf"><label>Ano</label><input type="number" id="mvYr" style="background:transparent;border:none;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;width:100%;outline:none;-webkit-appearance:none;"></div>
+    </div>
+    <button class="btn pri" style="margin-bottom:10px" onclick="confirmMove()">✅ Confirmar</button>
+    <button class="mv-cancel" onclick="document.getElementById('moveModal').classList.remove('on')">Cancelar</button>
+  </div>
+</div>
+
+<div id="userMenu">
+  <div class="um-bg" onclick="document.getElementById('userMenu').classList.remove('on')"></div>
+  <div class="um-box">
+    <div class="um-name" id="umName"></div>
+    <div class="um-email" id="umEmail"></div>
+    <div class="um-sep"></div>
+    <div class="um-item" onclick="goProf()">👤 Meu Perfil</div>
+    <div class="um-sep"></div>
+    <div class="um-item logout" onclick="logout()">🚪 Sair da Conta</div>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="loginScreen" class="active">
+  <div class="login-logo">💰</div>
+  <div class="login-title">Salário <span>Organizer</span></div>
+  <div class="login-sub">Gestão financeira pessoal.<br>Entre com sua conta para começar.</div>
+  <div class="login-card">
+    <div id="nameField" class="lf" style="display:none;"><label>Nome completo</label><input type="text" id="inName" placeholder="Thiago Silva" autocomplete="name"></div>
+    <div class="lf"><label>E-mail</label><input type="email" id="inEmail" placeholder="thiago@email.com" autocomplete="email"></div>
+    <div class="lf"><label>Senha</label>
+      <div class="pass-wrap">
+        <input type="password" id="inPass" placeholder="••••••••" autocomplete="current-password">
+        <button class="pass-eye" onclick="var f=document.getElementById('inPass');f.type=f.type==='password'?'text':'password';this.textContent=f.type==='password'?'👁':'🙈'">👁</button>
+      </div>
+    </div>
+    <button class="login-btn" id="loginBtn" onclick="handleAuth()">🔐 Entrar</button>
+    <div class="login-toggle" id="loginToggle">Não tem conta? <span onclick="setMode(true)">Criar conta</span></div>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+  <div class="login-footer">🔒 Dados salvos com segurança na nuvem.<br>Acesse de qualquer dispositivo.</div>
+</div>
+
+<!-- APP -->
+<div id="appScreen">
+  <div class="tabbar">
+    <div class="tab active" id="tab-main" onclick="gotoTab('main')">📊 Principal</div>
+    <div class="tab" id="tab-arch" onclick="gotoTab('arch')">📁 Anteriores</div>
+    <div class="tab" id="tab-prof" onclick="gotoTab('prof')">👤 Perfil</div>
+  </div>
+
+  <div class="page active" id="page-main">
+    <div id="capture">
+      <div class="hdr">
+        <div class="hdr-top">
+          <h1>Salário <span>Organizer</span></h1>
+          <div class="user-pill" onclick="document.getElementById('userMenu').classList.toggle('on')">
+            <div class="u-av" id="hdrAv">?</div>
+            <div class="u-nm" id="hdrNm">—</div>
+          </div>
+        </div>
+        <div class="month-sel">
+          <span>📅</span>
+          <select id="mSel" onchange="CM=parseInt(this.value);loadMonth()">
+            <option value="0">Janeiro</option><option value="1">Fevereiro</option><option value="2">Março</option>
+            <option value="3">Abril</option><option value="4">Maio</option><option value="5">Junho</option>
+            <option value="6">Julho</option><option value="7">Agosto</option><option value="8">Setembro</option>
+            <option value="9">Outubro</option><option value="10">Novembro</option><option value="11">Dezembro</option>
+          </select>
+          <span style="width:1px;height:13px;background:var(--border);display:inline-block;"></span>
+          <button class="yr-btn" onclick="CY--;document.getElementById('yrLbl').textContent=CY;loadMonth()">‹</button>
+          <span class="yr-label" id="yrLbl">2026</span>
+          <button class="yr-btn" onclick="CY++;document.getElementById('yrLbl').textContent=CY;loadMonth()">›</button>
+        </div>
+        <div class="total-box">
+          <div><div class="lbl">💰 Líquido Total Mensal</div><div class="big" id="totalNet">R$ 0,00</div></div>
+          <div class="disc-pill" id="totalDisc">- R$ 0,00</div>
+        </div>
+      </div>
+      <div class="content">
+        <div class="sec">📥 Entrada de Salários</div>
+        <div class="sc dr">
+          <div class="sc-head"><span class="tag dr">🏢 Rede Dor</span><span class="net-v" id="dNet">R$ 0,00</span></div>
+          <div class="sc-grid">
+            <div class="fi"><label>Bruto R$</label><input type="number" id="dBruto" placeholder="0" inputmode="decimal" oninput="calc()"></div>
+            <div class="fi"><label>Desc %</label><input type="number" id="dDesc" placeholder="0" inputmode="decimal" oninput="calc()"></div>
+            <div class="chk-cell"><span>Recebido</span><div class="chk-wrap" id="ck_dOk" onclick="tck('dOk')"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3" stroke="#071510" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+          </div>
+        </div>
+        <div class="sc rs">
+          <div class="sc-head"><span class="tag rs">🏥 Residência</span><span class="net-v" id="rNet">R$ 0,00</span></div>
+          <div class="sc-grid">
+            <div class="fi"><label>Bruto R$</label><input type="number" id="rBruto" placeholder="0" inputmode="decimal" oninput="calc()"></div>
+            <div class="fi"><label>Desc %</label><input type="number" id="rDesc" placeholder="0" inputmode="decimal" oninput="calc()"></div>
+            <div class="chk-cell"><span>Recebido</span><div class="chk-wrap" id="ck_rOk" onclick="tck('rOk')"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3" stroke="#071510" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+          </div>
+        </div>
+        <div class="sc pl">
+          <div class="sc-head"><span class="tag pl">⚡ Plantões</span><span class="net-v" id="pNet">R$ 0,00</span></div>
+          <div id="planWrap"></div>
+        </div>
+        <div class="sc" style="border-left:3px solid #a78bfa;">
+          <div class="sc-head" style="margin-bottom:10px;">
+            <div style="display:flex;align-items:center;gap:8px;flex:1;">
+              <span class="tag" style="background:rgba(167,139,250,.15);color:#a78bfa;">✨ Extra</span>
+              <input type="text" id="extraNome" placeholder="Descrição…" style="background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:7px;padding:4px 8px;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;flex:1;-webkit-appearance:none;">
+            </div>
+            <span class="net-v" id="eNet" style="color:#a78bfa;margin-left:10px;">R$ 0,00</span>
+          </div>
+          <div class="sc-grid">
+            <div class="fi"><label>Bruto R$</label><input type="number" id="eBruto" placeholder="0" inputmode="decimal" oninput="calc()"></div>
+            <div class="fi"><label>Desc %</label><input type="number" id="eDesc" placeholder="0" inputmode="decimal" oninput="calc()"></div>
+            <div class="chk-cell"><span>Recebido</span><div class="chk-wrap" id="ck_eOk" onclick="tck('eOk')"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3" stroke="#071510" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+          </div>
+        </div>
+        <div class="tbar">
+          <div class="ti"><div class="lbl">🏢 Door</div><div class="val" style="color:var(--accent)" id="bDoor">R$0</div></div>
+          <div class="ti"><div class="lbl">🏥 Residência</div><div class="val" style="color:var(--green)" id="bResid">R$0</div></div>
+          <div class="ti"><div class="lbl">⚡ Plantões</div><div class="val" style="color:var(--yellow)" id="bPlan">R$0</div></div>
+        </div>
+        <div class="isec">
+          <div class="sec" style="margin-top:0">📊 Aplicação dos Recursos</div>
+          <div class="iblk">
+            <div class="iblk-title"><div class="dot8" style="background:var(--green)"></div>Residência<span class="avail" id="rAvail">R$ 0,00</span></div>
+            <div class="br"><div class="bn"><div class="bd" style="background:#ff6600"></div>Itaú</div><div class="bw"><span>R$</span><input type="number" id="rItau" placeholder="0" inputmode="decimal" oninput="calcI()"></div><div class="bpct" id="rItauP">0%</div><div class="chk-wrap" id="ck_rItau" onclick="tck('rItau')"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3" stroke="#071510" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+            <div class="br"><div class="bn"><div class="bd" style="background:#8a05be"></div>Nubank</div><div class="bw"><span>R$</span><input type="number" id="rNu" placeholder="0" inputmode="decimal" oninput="calcI()"></div><div class="bpct" id="rNuP">0%</div><div class="chk-wrap" id="ck_rNu" onclick="tck('rNu')"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3" stroke="#071510" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+            <div class="br" style="border-bottom:none"><div class="bn"><div class="bd" style="background:#cc0000"></div>Bradesco</div><div class="bw"><span>R$</span><input type="number" id="rBrad" placeholder="0" inputmode="decimal" oninput="calcI()"></div><div class="bpct" id="rBradP">0%</div><div class="chk-wrap" id="ck_rBrad" onclick="tck('rBrad')"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3" stroke="#071510" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+            <div class="cust-row"><div class="cust-lbl">✏️ Personalizado</div>
+              <div class="cust-grid">
+                <div class="cf"><label>Nome</label><input type="text" id="rCNome" placeholder="CDB…"></div>
+                <div class="cf"><label>%</label><input type="number" id="rCPct" placeholder="0" inputmode="decimal" oninput="calcI()"></div>
+                <div class="cf"><label>Valor R$</label><input type="number" id="rCVal" placeholder="0" inputmode="decimal" oninput="calcI()"></div>
+                <div class="chk-wrap" id="ck_rCust" onclick="tck('rCust')" style="margin-bottom:2px"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3" stroke="#071510" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+            </div>
+            <div class="warn" id="rWarn">⚠️ Valor superior ao disponível</div>
+          </div>
+          <div class="iblk">
+            <div class="iblk-title"><div class="dot8" style="background:var(--accent)"></div>Rede Dor + Plantões + Extra<span class="avail" id="dAvail">R$ 0,00</span></div>
+            <div class="br"><div class="bn"><div class="bd" style="background:#cc0000"></div>Bradesco</div><div class="bw"><span>R$</span><input type="number" id="iBrad" placeholder="0" inputmode="decimal" oninput="calcI()"></div><div class="bpct" id="iBradP">0%</div><div class="chk-wrap" id="ck_iBrad" onclick="tck('iBrad')"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3" stroke="#071510" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+            <div class="br"><div class="bn"><div class="bd" style="background:#ff6600"></div>Itaú</div><div class="bw"><span>R$</span><input type="number" id="iItau" placeholder="0" inputmode="decimal" oninput="calcI()"></div><div class="bpct" id="iItauP">0%</div><div class="chk-wrap" id="ck_iItau" onclick="tck('iItau')"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3" stroke="#071510" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+            <div class="br" style="border-bottom:none"><div class="bn"><div class="bd" style="background:#ec0000"></div>Santander</div><div class="bw"><span>R$</span><input type="number" id="iSant" placeholder="0" inputmode="decimal" oninput="calcI()"></div><div class="bpct" id="iSantP">0%</div><div class="chk-wrap" id="ck_iSant" onclick="tck('iSant')"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3" stroke="#071510" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+            <div class="sub-blk">
+              <div class="sub-hdr">📈 Investimentos</div>
+              <div class="sub-row"><div class="sf"><label>Investimento 1</label><input type="text" id="i1n" placeholder="Tesouro Direto"></div><div class="sf"><label>Valor R$</label><input type="number" id="i1v" placeholder="0" inputmode="decimal" oninput="calcI()"></div><div class="chk-wrap" id="ck_i1" onclick="tck('i1')"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3" stroke="#071510" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+              <div class="sub-row"><div class="sf"><label>Investimento 2</label><input type="text" id="i2n" placeholder="LCI"></div><div class="sf"><label>Valor R$</label><input type="number" id="i2v" placeholder="0" inputmode="decimal" oninput="calcI()"></div><div class="chk-wrap" id="ck_i2" onclick="tck('i2')"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3" stroke="#071510" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+              <div class="sub-row"><div class="sf"><label>Investimento 3</label><input type="text" id="i3n" placeholder="CDB"></div><div class="sf"><label>Valor R$</label><input type="number" id="i3v" placeholder="0" inputmode="decimal" oninput="calcI()"></div><div class="chk-wrap" id="ck_i3" onclick="tck('i3')"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3" stroke="#071510" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+              <div class="sub-row"><div class="sf"><label>Investimento 4</label><input type="text" id="i4n" placeholder="Ações"></div><div class="sf"><label>Valor R$</label><input type="number" id="i4v" placeholder="0" inputmode="decimal" oninput="calcI()"></div><div class="chk-wrap" id="ck_i4" onclick="tck('i4')"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3" stroke="#071510" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+              <div class="sub-row"><div class="sf"><label>Investimento 5</label><input type="text" id="i5n" placeholder="FII"></div><div class="sf"><label>Valor R$</label><input type="number" id="i5v" placeholder="0" inputmode="decimal" oninput="calcI()"></div><div class="chk-wrap" id="ck_i5" onclick="tck('i5')"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3" stroke="#071510" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+            </div>
+            <div class="warn" id="dWarn">⚠️ Valor superior ao disponível</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:0 14px;">
+      <div class="btn-row">
+        <button class="btn pri" onclick="saveMes()">💾 Salvar Mês</button>
+        <button class="btn sec" onclick="acumular()">➕ Acumular</button>
+      </div>
+      <button class="btn imp" onclick="openImport()">📂 Importar Mês Salvo</button>
+      <button class="btn pdf" id="btnPDF" onclick="gerarPDF()">📄 Exportar PDF</button>
+      <div class="status" id="status"></div>
+    </div>
+  </div>
+
+  <div class="page" id="page-arch">
+    <div class="arch-hdr"><h2>📁 Meses Anteriores</h2><p>Edite, exporte ou reorganize seus meses salvos.</p></div>
+    <div class="arch-content" id="archContent"></div>
+  </div>
+
+  <div class="page" id="page-prof">
+    <div class="prof-hdr"><h2>👤 Meu Perfil</h2></div>
+    <div class="prof-content">
+      <div class="prof-av" id="profAv">?</div>
+      <div class="prof-name" id="profName">—</div>
+      <div class="prof-email" id="profEmail">—</div>
+      <div class="prof-card">
+        <div class="prof-row"><span class="prof-lbl">Meses salvos</span><span class="prof-val" id="profCount">0</span></div>
+        <div class="prof-row"><span class="prof-lbl">Membro desde</span><span class="prof-val" id="profSince">—</span></div>
+      </div>
+      <button class="logout-btn" onclick="logout()">🚪 Sair da Conta</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// ⚠️  SUBSTITUA AQUI pelas suas chaves do Supabase
+// ══════════════════════════════════════════
+var SUPA_URL = 'https://gsxdsludajbepmddwhhf.supabase.co/rest/v1/';
+var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzeGRzbHVkYWpiZXBtZGR3aGhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1NTA3MTIsImV4cCI6MjA5NDEyNjcxMn0.SUyaSj7BB_eghTUIEkwm-rpiGmPee7rERXaZrpvEwac';
+// ══════════════════════════════════════════
+
+var sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+var MN=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+var now=new Date(), CM=now.getMonth(), CY=now.getFullYear();
+var _pdfBlob=null, _pdfName='', _moveKey=null;
+var CKS={dOk:0,rOk:0,p1Ok:0,p2Ok:0,p3Ok:0,p4Ok:0,p5Ok:0,p6Ok:0,eOk:0,rItau:0,rNu:0,rBrad:0,rCust:0,iBrad:0,iItau:0,iSant:0,i1:0,i2:0,i3:0,i4:0,i5:0};
+var _regMode=false;
+var _allMeses=[];
+
+// ══ INIT ══
+(async function(){
+  showOverlay('Verificando sessão…');
+  var {data:{session}} = await sb.auth.getSession();
+  hideOverlay();
+  if(session){
+    await gotoApp(session.user);
+  } else {
+    showLogin();
+  }
+  sb.auth.onAuthStateChange(async function(event,session){
+    if(event==='SIGNED_IN' && session){ await gotoApp(session.user); }
+    if(event==='SIGNED_OUT'){ showLogin(); }
+  });
+})();
+
+// ══ AUTH ══
+function setMode(reg){
+  _regMode=reg;
+  document.getElementById('nameField').style.display=reg?'block':'none';
+  document.getElementById('loginBtn').textContent=reg?'✅ Criar Conta':'🔐 Entrar';
+  document.getElementById('loginToggle').innerHTML=reg
+    ?'Já tem conta? <span onclick="setMode(false)">Entrar</span>'
+    :'Não tem conta? <span onclick="setMode(true)">Criar conta</span>';
+  document.getElementById('loginErr').textContent='';
+}
+
+async function handleAuth(){
+  var email=(document.getElementById('inEmail').value||'').trim().toLowerCase();
+  var pass=document.getElementById('inPass').value||'';
+  var err=document.getElementById('loginErr');
+  if(!email||email.indexOf('@')<1){err.textContent='E-mail inválido.';return;}
+  if(pass.length<6){err.textContent='Senha mínima: 6 caracteres.';return;}
+  document.getElementById('loginBtn').disabled=true;
+  showOverlay(_regMode?'Criando conta…':'Entrando…');
+  if(_regMode){
+    var name=(document.getElementById('inName').value||'').trim();
+    if(!name){hideOverlay();document.getElementById('loginBtn').disabled=false;err.textContent='Informe seu nome.';return;}
+    var {error}=await sb.auth.signUp({email,password:pass,options:{data:{full_name:name}}});
+    if(error){hideOverlay();document.getElementById('loginBtn').disabled=false;err.textContent=traduzErro(error.message);return;}
+    hideOverlay();document.getElementById('loginBtn').disabled=false;
+    err.style.color='var(--green)';err.textContent='✅ Conta criada! Verifique seu e-mail para confirmar.';
+  } else {
+    var {error}=await sb.auth.signInWithPassword({email,password:pass});
+    if(error){hideOverlay();document.getElementById('loginBtn').disabled=false;err.textContent=traduzErro(error.message);return;}
+  }
+}
+
+function traduzErro(msg){
+  if(msg.includes('Invalid login'))return 'E-mail ou senha incorretos.';
+  if(msg.includes('already registered'))return 'E-mail já cadastrado. Faça login.';
+  if(msg.includes('Email not confirmed'))return 'Confirme seu e-mail antes de entrar.';
+  if(msg.includes('rate limit'))return 'Muitas tentativas. Aguarde um momento.';
+  return msg;
+}
+
+async function logout(){
+  if(!confirm('Sair da conta?'))return;
+  document.getElementById('userMenu').classList.remove('on');
+  await sb.auth.signOut();
+}
+
+function showLogin(){
+  hideOverlay();
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('appScreen').style.display='none';
+  document.getElementById('loginScreen').classList.add('active');
+  document.getElementById('inEmail').value='';
+  document.getElementById('inPass').value='';
+  document.getElementById('inName').value='';
+  document.getElementById('loginErr').textContent='';
+  document.getElementById('loginErr').style.color='var(--red)';
+  document.getElementById('loginBtn').disabled=false;
+  setMode(false);
+  clearForm();
+}
+
+async function gotoApp(user){
+  hideOverlay();
+  var name=user.user_metadata?.full_name||user.email.split('@')[0]||'Usuário';
+  var ini=name.split(' ').map(function(w){return w[0];}).slice(0,2).join('').toUpperCase();
+  var fn=name.split(' ')[0];
+  document.getElementById('hdrAv').textContent=ini;
+  document.getElementById('hdrNm').textContent=fn;
+  document.getElementById('umName').textContent=name;
+  document.getElementById('umEmail').textContent=user.email;
+  document.getElementById('profAv').textContent=ini;
+  document.getElementById('profName').textContent=name;
+  document.getElementById('profEmail').textContent=user.email;
+  var since=new Date(user.created_at).toLocaleDateString('pt-BR');
+  document.getElementById('profSince').textContent=since;
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('appScreen').style.display='block';
+  buildPlantoes();
+  gotoTab('main');
+  document.getElementById('mSel').value=CM;
+  document.getElementById('yrLbl').textContent=CY;
+  await loadMonth();
+  await loadAllMeses();
+}
+
+// ══ PLANTÕES ══
+function buildPlantoes(){
+  var w=document.getElementById('planWrap');
+  w.innerHTML='';
+  for(var i=1;i<=6;i++){
+    var r=document.createElement('div');
+    r.style.cssText='display:grid;grid-template-columns:1fr 1fr 72px 48px;gap:6px;align-items:end;margin-bottom:'+(i<6?'7':'0')+'px;';
+    var ck='p'+i+'Ok';
+    r.innerHTML='<div class="fi"><label>Descrição</label><input type="text" id="p'+i+'Nome" placeholder="Ex: Plantão…" style="background:transparent;border:none;color:var(--text);font-size:13px;font-family:\'DM Sans\',sans-serif;width:100%;outline:none;-webkit-appearance:none;"></div>'
+      +'<div class="fi"><label>Bruto R$</label><input type="number" id="p'+i+'Bruto" placeholder="0" inputmode="decimal" oninput="calc()"></div>'
+      +'<div class="fi"><label>Desc %</label><input type="number" id="p'+i+'Desc" placeholder="0" inputmode="decimal" oninput="calc()"></div>'
+      +'<div class="chk-cell"><span>Recebido</span><div class="chk-wrap" id="ck_'+ck+'" onclick="tck(\''+ck+'\')"><svg viewBox="0 0 14 14" fill="none"><polyline points="2,7 6,11 12,3" stroke="#071510" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>';
+    w.appendChild(r);
+  }
+}
+
+// ══ TABS ══
+function gotoTab(t){
+  ['main','arch','prof'].forEach(function(n){
+    document.getElementById('page-'+n).classList.toggle('active',n===t);
+    document.getElementById('tab-'+n).classList.toggle('active',n===t);
+  });
+  document.getElementById('userMenu').classList.remove('on');
+  if(t==='arch')renderArch();
+  if(t==='prof')document.getElementById('profCount').textContent=_allMeses.length;
+}
+function goProf(){document.getElementById('userMenu').classList.remove('on');gotoTab('prof');}
+
+// ══ SUPABASE: CARREGAR / SALVAR ══
+async function loadAllMeses(){
+  var {data:{user}}=await sb.auth.getUser();
+  if(!user)return;
+  var {data}=await sb.from('salario_meses').select('mes,ano,dados,updated_at').eq('user_id',user.id).order('ano',{ascending:false}).order('mes',{ascending:false});
+  _allMeses=data||[];
+  document.getElementById('profCount').textContent=_allMeses.length;
+}
+
+async function loadMonth(){
+  var {data:{user}}=await sb.auth.getUser();
+  if(!user)return;
+  showOverlay('Carregando '+MN[CM]+'…');
+  var {data}=await sb.from('salario_meses').select('dados').eq('user_id',user.id).eq('mes',CM).eq('ano',CY).maybeSingle();
+  hideOverlay();
+  setData(data?data.dados:null);
+}
+
+async function saveMes(){
+  var {data:{user}}=await sb.auth.getUser();
+  if(!user)return;
+  showOverlay('Salvando…');
+  var {error}=await sb.from('salario_meses').upsert({
+    user_id:user.id, mes:CM, ano:CY,
+    dados:getData(),
+    updated_at:new Date().toISOString()
+  },{onConflict:'user_id,mes,ano'});
+  hideOverlay();
+  if(error){setStatus('❌ Erro ao salvar: '+error.message);}
+  else{setStatus('✅ Mês salvo na nuvem!');await loadAllMeses();}
+}
+
+// ══ FIELDS ══
+var NUMS=['dBruto','dDesc','rBruto','rDesc','p1Bruto','p1Desc','p2Bruto','p2Desc','p3Bruto','p3Desc','p4Bruto','p4Desc','p5Bruto','p5Desc','p6Bruto','p6Desc','eBruto','eDesc','rItau','rNu','rBrad','rCPct','rCVal','iBrad','iItau','iSant','i1v','i2v','i3v','i4v','i5v'];
+var TXTS=['extraNome','p1Nome','p2Nome','p3Nome','p4Nome','p5Nome','p6Nome','rCNome','i1n','i2n','i3n','i4n','i5n'];
+var CKK=Object.keys(CKS);
+
+function getData(){
+  var o={ts:Date.now(),checks:{}};
+  NUMS.concat(TXTS).forEach(function(f){var e=document.getElementById(f);o[f]=e?e.value:'';});
+  CKK.forEach(function(k){o.checks[k]=CKS[k];});
+  return o;
+}
+function setData(o){
+  NUMS.concat(TXTS).forEach(function(f){var e=document.getElementById(f);if(e)e.value=o&&o[f]?o[f]:'';});
+  CKK.forEach(function(k){CKS[k]=o&&o.checks&&o.checks[k]?1:0;var e=document.getElementById('ck_'+k);if(e)e.classList.toggle('on',!!CKS[k]);});
+  calc();
+}
+function clearForm(){setData(null);}
+function tck(k){CKS[k]=CKS[k]?0:1;var e=document.getElementById('ck_'+k);if(e)e.classList.toggle('on',!!CKS[k]);}
+
+// ══ CALC ══
+function gn(id){return parseFloat((document.getElementById(id)||{}).value)||0;}
+function liq(b,p){return b*(1-p/100);}
+function fmt(n){return 'R$ '+n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function fmtS(n){return n>=1000?'R$'+(n/1000).toFixed(1)+'k':'R$'+Math.round(n);}
+function tx(id,v){var e=document.getElementById(id);if(e)e.textContent=v;}
+function calc(){
+  var dN=liq(gn('dBruto'),gn('dDesc')),rN=liq(gn('rBruto'),gn('rDesc'));
+  var pN=[1,2,3,4,5,6].reduce(function(a,i){return a+liq(gn('p'+i+'Bruto'),gn('p'+i+'Desc'));},0);
+  var eN=liq(gn('eBruto'),gn('eDesc'));
+  var disc=(gn('dBruto')-dN)+(gn('rBruto')-rN)+[1,2,3,4,5,6].reduce(function(a,i){return a+(gn('p'+i+'Bruto')-liq(gn('p'+i+'Bruto'),gn('p'+i+'Desc')));},0)+(gn('eBruto')-eN);
+  tx('dNet',fmt(dN));tx('rNet',fmt(rN));tx('pNet',fmt(pN));tx('eNet',fmt(eN));
+  tx('totalNet',fmt(dN+rN+pN+eN));tx('totalDisc','- '+fmt(disc<0?0:disc));
+  tx('bDoor',fmtS(dN));tx('bResid',fmtS(rN));tx('bPlan',fmtS(pN));
+  calcI();
+}
+function calcI(){
+  var rA=liq(gn('rBruto'),gn('rDesc'));
+  var pT=[1,2,3,4,5,6].reduce(function(a,i){return a+liq(gn('p'+i+'Bruto'),gn('p'+i+'Desc'));},0);
+  var dA=liq(gn('dBruto'),gn('dDesc'))+pT+liq(gn('eBruto'),gn('eDesc'));
+  function pct(v,t){return t>0?Math.round(v/t*100)+'%':'0%';}
+  tx('rItauP',pct(gn('rItau'),rA));tx('rNuP',pct(gn('rNu'),rA));tx('rBradP',pct(gn('rBrad'),rA));
+  var rT=gn('rItau')+gn('rNu')+gn('rBrad')+gn('rCVal');
+  avail('rAvail',rA-rT);tog('rWarn',rA>0&&(rA-rT)<-0.01);
+  tx('iBradP',pct(gn('iBrad'),dA));tx('iItauP',pct(gn('iItau'),dA));tx('iSantP',pct(gn('iSant'),dA));
+  var dT=gn('iBrad')+gn('iItau')+gn('iSant')+[1,2,3,4,5].reduce(function(a,i){return a+gn('i'+i+'v');},0);
+  avail('dAvail',dA-dT);tog('dWarn',dA>0&&(dA-dT)<-0.01);
+}
+function avail(id,s){
+  var e=document.getElementById(id);if(!e)return;
+  e.textContent=(s<0?'- ':'')+fmt(Math.abs(s));
+  if(s<0){e.style.background='rgba(255,107,107,.15)';e.style.borderColor='rgba(255,107,107,.35)';e.style.color='#ff6b6b';}
+  else if(Math.abs(s)<0.01){e.style.background='rgba(255,212,59,.12)';e.style.borderColor='rgba(255,212,59,.3)';e.style.color='#ffd43b';}
+  else{e.style.background='rgba(56,217,169,.12)';e.style.borderColor='rgba(56,217,169,.25)';e.style.color='#38d9a9';}
+}
+function tog(id,on){var e=document.getElementById(id);if(e)e.classList.toggle('on',on);}
+function netFromObj(o){
+  function g(f){return parseFloat(o&&o[f])||0;}
+  return liq(g('dBruto'),g('dDesc'))+liq(g('rBruto'),g('rDesc'))+[1,2,3,4,5,6].reduce(function(a,i){return a+liq(g('p'+i+'Bruto'),g('p'+i+'Desc'));},0)+liq(g('eBruto'),g('eDesc'));
+}
+
+// ══ ACUMULAR ══
+async function acumular(){
+  var pm=CM-1,py=CY;if(pm<0){pm=11;py--;}
+  var {data:{user}}=await sb.auth.getUser();
+  if(!user)return;
+  showOverlay('Buscando mês anterior…');
+  var {data}=await sb.from('salario_meses').select('dados').eq('user_id',user.id).eq('mes',pm).eq('ano',py).maybeSingle();
+  hideOverlay();
+  if(!data){setStatus('⚠️ Mês anterior não encontrado.');return;}
+  var prev=data.dados;
+  NUMS.forEach(function(f){var pv=parseFloat(prev[f])||0,cv=gn(f);var e=document.getElementById(f);if(e&&pv)e.value=String(pv+cv);});
+  calc();setStatus('✅ Acumulado com '+MN[pm]+'/'+py+'!');
+}
+
+// ══ IMPORT ══
+async function openImport(){
+  await loadAllMeses();
+  var html='';
+  if(!_allMeses.length)html='<div class="im-empty">Nenhum mês salvo ainda.</div>';
+  else _allMeses.forEach(function(row){
+    html+='<div class="im-item" onclick="importMes('+row.mes+','+row.ano+')"><div class="im-info"><div class="im-name">'+MN[row.mes]+' '+row.ano+'</div><div class="im-net">Líquido: '+fmt(netFromObj(row.dados))+'</div></div><div class="im-arrow">→</div></div>';
+  });
+  document.getElementById('imList').innerHTML=html;
+  document.getElementById('importModal').classList.add('on');
+}
+function closeImport(){document.getElementById('importModal').classList.remove('on');}
+async function importMes(m,y){
+  CM=m;CY=y;
+  document.getElementById('mSel').value=CM;
+  document.getElementById('yrLbl').textContent=CY;
+  closeImport();gotoTab('main');window.scrollTo({top:0,behavior:'smooth'});
+  await loadMonth();
+  setStatus('✅ '+MN[CM]+' '+CY+' importado!');
+}
+
+// ══ ARCH ══
+function renderArch(){
+  var el=document.getElementById('archContent');
+  if(!_allMeses.length){el.innerHTML='<div class="arch-empty"><div>📂</div><p>Nenhum mês salvo ainda.</p></div>';return;}
+  var h='';
+  _allMeses.forEach(function(row){
+    var dt=row.updated_at?new Date(row.updated_at).toLocaleDateString('pt-BR'):'—';
+    h+='<div class="acard"><div class="acard-top"><div class="acard-icon">📅</div><div class="acard-info"><div class="acard-name">'+MN[row.mes]+' '+row.ano+'</div><div class="acard-net">Líquido: '+fmt(netFromObj(row.dados))+'</div><div class="acard-date">Salvo em: '+dt+'</div></div></div>'
+      +'<div class="acard-acts">'
+      +'<button class="aact" onclick="editArch('+row.mes+','+row.ano+')"><span class="aact-ic">✏️</span>Editar</button>'
+      +'<button class="aact" onclick="pdfArch('+row.mes+','+row.ano+')"><span class="aact-ic">📄</span>PDF</button>'
+      +'<button class="aact" onclick="openMove('+row.mes+','+row.ano+')"><span class="aact-ic">↕</span>Mover</button>'
+      +'<button class="aact" onclick="delArch('+row.mes+','+row.ano+')"><span class="aact-ic">🗑</span>Excluir</button>'
+      +'</div></div>';
+  });
+  el.innerHTML=h;
+}
+
+async function editArch(m,y){
+  CM=m;CY=y;document.getElementById('mSel').value=CM;document.getElementById('yrLbl').textContent=CY;
+  gotoTab('main');window.scrollTo({top:0,behavior:'smooth'});
+  await loadMonth();setStatus('✏️ '+MN[m]+' '+y+' carregado para edição');
+}
+
+async function delArch(m,y){
+  if(!confirm('Excluir '+MN[m]+' '+y+'?'))return;
+  var {data:{user}}=await sb.auth.getUser();
+  if(!user)return;
+  showOverlay('Excluindo…');
+  await sb.from('salario_meses').delete().eq('user_id',user.id).eq('mes',m).eq('ano',y);
+  hideOverlay();
+  await loadAllMeses();renderArch();
+}
+
+async function pdfArch(m,y){
+  var oCM=CM,oCY=CY;
+  CM=m;CY=y;document.getElementById('mSel').value=CM;document.getElementById('yrLbl').textContent=CY;
+  await loadMonth();
+  setTimeout(function(){gerarPDF(async function(){CM=oCM;CY=oCY;document.getElementById('mSel').value=CM;document.getElementById('yrLbl').textContent=CY;await loadMonth();});},100);
+}
+
+function openMove(m,y){
+  _moveKey={m:m,y:y};
+  document.getElementById('mvSub').textContent='Movendo: '+MN[m]+' '+y;
+  document.getElementById('mvMon').value=m;document.getElementById('mvYr').value=y;
+  document.getElementById('moveModal').classList.add('on');
+}
+
+async function confirmMove(){
+  if(!_moveKey)return;
+  var nm=parseInt(document.getElementById('mvMon').value),ny=parseInt(document.getElementById('mvYr').value)||CY;
+  if(nm===_moveKey.m&&ny===_moveKey.y){document.getElementById('moveModal').classList.remove('on');return;}
+  var {data:{user}}=await sb.auth.getUser();if(!user)return;
+  showOverlay('Movendo…');
+  var {data:src}=await sb.from('salario_meses').select('dados').eq('user_id',user.id).eq('mes',_moveKey.m).eq('ano',_moveKey.y).maybeSingle();
+  if(!src){hideOverlay();document.getElementById('moveModal').classList.remove('on');return;}
+  var exists=await sb.from('salario_meses').select('id').eq('user_id',user.id).eq('mes',nm).eq('ano',ny).maybeSingle();
+  if(exists.data&&!confirm(MN[nm]+' '+ny+' já existe. Substituir?')){hideOverlay();document.getElementById('moveModal').classList.remove('on');return;}
+  await sb.from('salario_meses').upsert({user_id:user.id,mes:nm,ano:ny,dados:src.dados,updated_at:new Date().toISOString()},{onConflict:'user_id,mes,ano'});
+  await sb.from('salario_meses').delete().eq('user_id',user.id).eq('mes',_moveKey.m).eq('ano',_moveKey.y);
+  hideOverlay();document.getElementById('moveModal').classList.remove('on');
+  _moveKey=null;await loadAllMeses();renderArch();
+}
+
+// ══ OVERLAY ══
+function showOverlay(msg,sub){
+  document.getElementById('ovMsg').textContent=msg||'Aguarde…';
+  document.getElementById('ovSub').textContent=sub||'';
+  document.getElementById('overlay').classList.add('on');
+}
+function hideOverlay(){document.getElementById('overlay').classList.remove('on');}
+
+// ══ STATUS ══
+function setStatus(msg){var e=document.getElementById('status');e.textContent=msg;setTimeout(function(){e.textContent='';},4000);}
+
+// ══ PDF ══
+function gerarPDF(cb){
+  var btn=document.getElementById('btnPDF');btn.disabled=true;
+  showOverlay('Preparando PDF…');
+  setTimeout(function(){
+    var src=document.getElementById('capture');
+    var clone=src.cloneNode(true);
+    src.querySelectorAll('input,select').forEach(function(el,i){var c=clone.querySelectorAll('input,select')[i];if(c)c.value=el.value;});
+    clone.querySelectorAll('input').forEach(function(inp){
+      var dv=document.createElement('div');dv.textContent=inp.value||'—';
+      ['color','fontFamily','fontSize','fontWeight'].forEach(function(p){dv.style[p]=getComputedStyle(inp)[p];});
+      dv.style.width='100%';inp.parentNode.replaceChild(dv,inp);
+    });
+    clone.querySelectorAll('select').forEach(function(sel){
+      var dv=document.createElement('div');dv.textContent=sel.options[sel.selectedIndex]?sel.options[sel.selectedIndex].text:'';
+      dv.style.cssText='color:#e8edf5;font-size:13px;';sel.parentNode.replaceChild(dv,sel);
+    });
+    clone.style.cssText='position:fixed;top:0;left:-9999px;width:430px;background:#0e1117;padding-bottom:20px;';
+    document.body.appendChild(clone);
+    showOverlay('Capturando tela…');
+    html2canvas(clone,{backgroundColor:'#0e1117',scale:2,useCORS:true,scrollX:0,scrollY:0,width:430,height:clone.scrollHeight,windowWidth:430,windowHeight:clone.scrollHeight,logging:false})
+    .then(function(canvas){
+      document.body.removeChild(clone);
+      showOverlay('Montando PDF…');
+      var img=canvas.toDataURL('image/png'),pw=210,ph=Math.round(canvas.height/canvas.width*pw);
+      var pdf=new window.jspdf.jsPDF({orientation:'p',unit:'mm',format:[pw,ph]});
+      pdf.addImage(img,'PNG',0,0,pw,ph);
+      _pdfBlob=pdf.output('blob');_pdfName='Salario_'+MN[CM]+'_'+CY+'.pdf';
+      document.getElementById('pvScroll').innerHTML='<img src="'+img+'" style="max-width:100%;border-radius:6px;">';
+      document.getElementById('pvTitle').textContent='Extrato — '+MN[CM]+' '+CY;
+      hideOverlay();btn.disabled=false;
+      document.getElementById('preview').classList.add('on');
+      if(cb)cb();
+    }).catch(function(){
+      document.body.removeChild(clone);hideOverlay();btn.disabled=false;setStatus('❌ Erro ao gerar PDF.');if(cb)cb();
+    });
+  },200);
+}
+function downloadPDF(){
+  if(!_pdfBlob)return;
+  var url=URL.createObjectURL(_pdfBlob);
+  if(navigator.share&&navigator.canShare){
+    var f=new File([_pdfBlob],_pdfName,{type:'application/pdf'});
+    if(navigator.canShare({files:[f]})){navigator.share({files:[f],title:_pdfName}).then(function(){URL.revokeObjectURL(url);closePreview();}).catch(function(e){if(e.name!=='AbortError')dl(url);});return;}
+  }
+  dl(url);
+}
+function dl(url){var a=document.createElement('a');a.href=url;a.download=_pdfName;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(url);},15000);closePreview();}
+function closePreview(){document.getElementById('preview').classList.remove('on');}
+</script>
+</body>
+</html>
