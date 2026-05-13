@@ -421,16 +421,28 @@ var _allMeses=[];
 // ══ INIT ══
 (async function(){
   showOverlay('Verificando sessão…');
-  var {data:{session}} = await sb.auth.getSession();
-  hideOverlay();
-  if(session){
-    await gotoApp(session.user);
-  } else {
+  // timeout de segurança: se travar por mais de 6s, vai para login
+  var safetyTimer = setTimeout(function(){
+    hideOverlay();
+    showLogin();
+  }, 6000);
+  try {
+    var result = await sb.auth.getSession();
+    clearTimeout(safetyTimer);
+    var session = result && result.data && result.data.session;
+    if(session && session.user){
+      await gotoApp(session.user);
+    } else {
+      showLogin();
+    }
+  } catch(e){
+    clearTimeout(safetyTimer);
     showLogin();
   }
-  sb.auth.onAuthStateChange(async function(event,session){
-    if(event==='SIGNED_IN' && session){ await gotoApp(session.user); }
+  sb.auth.onAuthStateChange(async function(event, session){
+    if(event==='SIGNED_IN' && session && session.user){ await gotoApp(session.user); }
     if(event==='SIGNED_OUT'){ showLogin(); }
+    if(event==='TOKEN_REFRESHED' && session && session.user){ /* silencioso */ }
   });
 })();
 
@@ -449,20 +461,30 @@ async function handleAuth(){
   var email=(document.getElementById('inEmail').value||'').trim().toLowerCase();
   var pass=document.getElementById('inPass').value||'';
   var err=document.getElementById('loginErr');
+  err.textContent='';
   if(!email||email.indexOf('@')<1){err.textContent='E-mail inválido.';return;}
   if(pass.length<6){err.textContent='Senha mínima: 6 caracteres.';return;}
   document.getElementById('loginBtn').disabled=true;
   showOverlay(_regMode?'Criando conta…':'Entrando…');
-  if(_regMode){
-    var name=(document.getElementById('inName').value||'').trim();
-    if(!name){hideOverlay();document.getElementById('loginBtn').disabled=false;err.textContent='Informe seu nome.';return;}
-    var {error}=await sb.auth.signUp({email,password:pass,options:{data:{full_name:name}}});
-    if(error){hideOverlay();document.getElementById('loginBtn').disabled=false;err.textContent=traduzErro(error.message);return;}
+  try {
+    if(_regMode){
+      var name=(document.getElementById('inName').value||'').trim();
+      if(!name){hideOverlay();document.getElementById('loginBtn').disabled=false;err.textContent='Informe seu nome.';return;}
+      var {error:eReg}=await sb.auth.signUp({email:email,password:pass,options:{data:{full_name:name}}});
+      hideOverlay();document.getElementById('loginBtn').disabled=false;
+      if(eReg){err.textContent=traduzErro(eReg.message);return;}
+      err.style.color='var(--green)';err.textContent='✅ Conta criada! Verifique seu e-mail para confirmar.';
+    } else {
+      var safetyTimer=setTimeout(function(){hideOverlay();document.getElementById('loginBtn').disabled=false;err.textContent='Tempo esgotado. Verifique sua conexão e tente novamente.';},10000);
+      var {data:loginData,error:eLog}=await sb.auth.signInWithPassword({email:email,password:pass});
+      clearTimeout(safetyTimer);
+      hideOverlay();document.getElementById('loginBtn').disabled=false;
+      if(eLog){err.textContent=traduzErro(eLog.message);return;}
+      if(loginData&&loginData.user){await gotoApp(loginData.user);}
+    }
+  } catch(e){
     hideOverlay();document.getElementById('loginBtn').disabled=false;
-    err.style.color='var(--green)';err.textContent='✅ Conta criada! Verifique seu e-mail para confirmar.';
-  } else {
-    var {error}=await sb.auth.signInWithPassword({email,password:pass});
-    if(error){hideOverlay();document.getElementById('loginBtn').disabled=false;err.textContent=traduzErro(error.message);return;}
+    err.textContent='Erro de conexão. Verifique sua internet e tente novamente.';
   }
 }
 
@@ -548,35 +570,50 @@ function gotoTab(t){
 function goProf(){document.getElementById('userMenu').classList.remove('on');gotoTab('prof');}
 
 // ══ SUPABASE: CARREGAR / SALVAR ══
+async function getUser(){
+  try{
+    var {data,error}=await sb.auth.getUser();
+    if(error||!data||!data.user)return null;
+    return data.user;
+  }catch(e){return null;}
+}
+
 async function loadAllMeses(){
-  var {data:{user}}=await sb.auth.getUser();
+  var user=await getUser();
   if(!user)return;
-  var {data}=await sb.from('salario_meses').select('mes,ano,dados,updated_at').eq('user_id',user.id).order('ano',{ascending:false}).order('mes',{ascending:false});
-  _allMeses=data||[];
-  document.getElementById('profCount').textContent=_allMeses.length;
+  try{
+    var {data}=await sb.from('salario_meses').select('mes,ano,dados,updated_at').eq('user_id',user.id).order('ano',{ascending:false}).order('mes',{ascending:false});
+    _allMeses=data||[];
+    document.getElementById('profCount').textContent=_allMeses.length;
+  }catch(e){_allMeses=[];}
 }
 
 async function loadMonth(){
-  var {data:{user}}=await sb.auth.getUser();
+  var user=await getUser();
+  clearForm();
   if(!user)return;
   showOverlay('Carregando '+MN[CM]+'…');
-  var {data}=await sb.from('salario_meses').select('dados').eq('user_id',user.id).eq('mes',CM).eq('ano',CY).maybeSingle();
-  hideOverlay();
-  setData(data?data.dados:null);
+  try{
+    var {data}=await sb.from('salario_meses').select('dados').eq('user_id',user.id).eq('mes',CM).eq('ano',CY).maybeSingle();
+    hideOverlay();
+    setData(data?data.dados:null);
+  }catch(e){hideOverlay();setData(null);}
 }
 
 async function saveMes(){
-  var {data:{user}}=await sb.auth.getUser();
-  if(!user)return;
+  var user=await getUser();
+  if(!user){setStatus('❌ Sessão expirada. Faça login novamente.');return;}
   showOverlay('Salvando…');
-  var {error}=await sb.from('salario_meses').upsert({
-    user_id:user.id, mes:CM, ano:CY,
-    dados:getData(),
-    updated_at:new Date().toISOString()
-  },{onConflict:'user_id,mes,ano'});
-  hideOverlay();
-  if(error){setStatus('❌ Erro ao salvar: '+error.message);}
-  else{setStatus('✅ Mês salvo na nuvem!');await loadAllMeses();}
+  try{
+    var {error}=await sb.from('salario_meses').upsert({
+      user_id:user.id, mes:CM, ano:CY,
+      dados:getData(),
+      updated_at:new Date().toISOString()
+    },{onConflict:'user_id,mes,ano'});
+    hideOverlay();
+    if(error){setStatus('❌ Erro: '+error.message);}
+    else{setStatus('✅ Mês salvo na nuvem!');await loadAllMeses();}
+  }catch(e){hideOverlay();setStatus('❌ Erro de conexão ao salvar.');}
 }
 
 // ══ FIELDS ══
@@ -642,15 +679,17 @@ function netFromObj(o){
 // ══ ACUMULAR ══
 async function acumular(){
   var pm=CM-1,py=CY;if(pm<0){pm=11;py--;}
-  var {data:{user}}=await sb.auth.getUser();
-  if(!user)return;
+  var user=await getUser();
+  if(!user){setStatus('❌ Sessão expirada. Faça login novamente.');return;}
   showOverlay('Buscando mês anterior…');
-  var {data}=await sb.from('salario_meses').select('dados').eq('user_id',user.id).eq('mes',pm).eq('ano',py).maybeSingle();
-  hideOverlay();
-  if(!data){setStatus('⚠️ Mês anterior não encontrado.');return;}
-  var prev=data.dados;
-  NUMS.forEach(function(f){var pv=parseFloat(prev[f])||0,cv=gn(f);var e=document.getElementById(f);if(e&&pv)e.value=String(pv+cv);});
-  calc();setStatus('✅ Acumulado com '+MN[pm]+'/'+py+'!');
+  try{
+    var {data}=await sb.from('salario_meses').select('dados').eq('user_id',user.id).eq('mes',pm).eq('ano',py).maybeSingle();
+    hideOverlay();
+    if(!data){setStatus('⚠️ Mês anterior não encontrado.');return;}
+    var prev=data.dados;
+    NUMS.forEach(function(f){var pv=parseFloat(prev[f])||0,cv=gn(f);var e=document.getElementById(f);if(e&&pv)e.value=String(pv+cv);});
+    calc();setStatus('✅ Acumulado com '+MN[pm]+'/'+py+'!');
+  }catch(e){hideOverlay();setStatus('❌ Erro de conexão.');}
 }
 
 // ══ IMPORT ══
@@ -700,12 +739,13 @@ async function editArch(m,y){
 
 async function delArch(m,y){
   if(!confirm('Excluir '+MN[m]+' '+y+'?'))return;
-  var {data:{user}}=await sb.auth.getUser();
+  var user=await getUser();
   if(!user)return;
   showOverlay('Excluindo…');
-  await sb.from('salario_meses').delete().eq('user_id',user.id).eq('mes',m).eq('ano',y);
-  hideOverlay();
-  await loadAllMeses();renderArch();
+  try{
+    await sb.from('salario_meses').delete().eq('user_id',user.id).eq('mes',m).eq('ano',y);
+    hideOverlay();await loadAllMeses();renderArch();
+  }catch(e){hideOverlay();setStatus('❌ Erro ao excluir.');}
 }
 
 async function pdfArch(m,y){
@@ -726,16 +766,18 @@ async function confirmMove(){
   if(!_moveKey)return;
   var nm=parseInt(document.getElementById('mvMon').value),ny=parseInt(document.getElementById('mvYr').value)||CY;
   if(nm===_moveKey.m&&ny===_moveKey.y){document.getElementById('moveModal').classList.remove('on');return;}
-  var {data:{user}}=await sb.auth.getUser();if(!user)return;
+  var user=await getUser();if(!user)return;
   showOverlay('Movendo…');
-  var {data:src}=await sb.from('salario_meses').select('dados').eq('user_id',user.id).eq('mes',_moveKey.m).eq('ano',_moveKey.y).maybeSingle();
-  if(!src){hideOverlay();document.getElementById('moveModal').classList.remove('on');return;}
-  var exists=await sb.from('salario_meses').select('id').eq('user_id',user.id).eq('mes',nm).eq('ano',ny).maybeSingle();
-  if(exists.data&&!confirm(MN[nm]+' '+ny+' já existe. Substituir?')){hideOverlay();document.getElementById('moveModal').classList.remove('on');return;}
-  await sb.from('salario_meses').upsert({user_id:user.id,mes:nm,ano:ny,dados:src.dados,updated_at:new Date().toISOString()},{onConflict:'user_id,mes,ano'});
-  await sb.from('salario_meses').delete().eq('user_id',user.id).eq('mes',_moveKey.m).eq('ano',_moveKey.y);
-  hideOverlay();document.getElementById('moveModal').classList.remove('on');
-  _moveKey=null;await loadAllMeses();renderArch();
+  try{
+    var {data:src}=await sb.from('salario_meses').select('dados').eq('user_id',user.id).eq('mes',_moveKey.m).eq('ano',_moveKey.y).maybeSingle();
+    if(!src){hideOverlay();document.getElementById('moveModal').classList.remove('on');return;}
+    var exists=await sb.from('salario_meses').select('id').eq('user_id',user.id).eq('mes',nm).eq('ano',ny).maybeSingle();
+    if(exists.data&&!confirm(MN[nm]+' '+ny+' já existe. Substituir?')){hideOverlay();document.getElementById('moveModal').classList.remove('on');return;}
+    await sb.from('salario_meses').upsert({user_id:user.id,mes:nm,ano:ny,dados:src.dados,updated_at:new Date().toISOString()},{onConflict:'user_id,mes,ano'});
+    await sb.from('salario_meses').delete().eq('user_id',user.id).eq('mes',_moveKey.m).eq('ano',_moveKey.y);
+    hideOverlay();document.getElementById('moveModal').classList.remove('on');
+    _moveKey=null;await loadAllMeses();renderArch();
+  }catch(e){hideOverlay();setStatus('❌ Erro ao mover.');}
 }
 
 // ══ OVERLAY ══
